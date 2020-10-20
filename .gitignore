@@ -55,3 +55,6 @@ docs/_build/
 
 # .root files
 *.root
+
+# Notebooks
+.ipynb_checkpoints/*
