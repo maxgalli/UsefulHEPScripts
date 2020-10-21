@@ -56,6 +56,7 @@ def main():
     number = 500
     tree_path = 'tagAndProbeDumper/trees/DYJetsToLL_amcatnloFXFX_13TeV_All'
     output_file = 'tnp_mc.root'
+    variables = variables + ['probeChIso03worst_uncorr', 'probeChIso03_uncorr', 'probePhoIdMVA_uncorr', 'probeSigmaIeIe_uncorr', 'probeCovarianceIeIp_uncorr', 'probeS4_uncorr']
 
     # Create and fill TChain
     chain = fill_tchain(base_dir, file_name, number, tree_path)
