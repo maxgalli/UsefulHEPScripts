@@ -72,7 +72,7 @@ def main():
     rdf = dump_snapshot(chain, output_file, tree_path)
 
     # Simulation
-    base_dir = '/eos/cms/store/group/phys_higgs/cmshgg/gallim/TnPProduction/_mc_UL17'
+    base_dir = '/eos/cms/store/group/phys_higgs/cmshgg/gallim/TnPProduction/02112020_mc_UL17'
     file_name = 'output_DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_alesauva-UL2017-10_6_4-v2-RunIISummer19UL17MiniAOD-106X_mc2017_realistic_v6-v2-c148a697ba5b08ec1e824b73db044236_USER_{}.root'
     number = 500
     tree_path = 'tagAndProbeDumper/trees/DYJetsToLL_amcatnloFXFX_13TeV_All'
