@@ -1,9 +1,7 @@
-This folder includes a study performed to investigate the possibility of  
-efficiently apply tags and systematics in an RDataFrame analysis flow.  
-The application would be the new flashgg framework.  
-  
-The idea consists in train a model with XGBoost for some variables and then  
-apply it, in the context of an RDataFrame flow, to a new dataset which has the  
+This folder includes useful studies performed to find an optimal structure for the bew flashgg framework.
+
+## XGBoost -> RDataFrame
+Here we investigate the possibility of  efficiently apply tags and systematics in an RDataFrame analysis flow.  The application would be the new flashgg framework. The idea consists in training a model with XGBoost for some variables and then  apply it, in the context of an RDataFrame flow, to a new dataset which has the  
 same variables the model was trained with plus two "modified" versions (Up and  
 Down, which represent the systematics).  
   
