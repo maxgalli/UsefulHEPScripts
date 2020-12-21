@@ -58,6 +58,10 @@ docs/_build/
 
 # Notebooks
 .ipynb_checkpoints/*
+*/.ipynb_checkpoints/*
 
 # Pickle files
 *.pkl
+
+# Dask
+dask-worker-space

@@ -19,6 +19,7 @@ def define_variables(df):
 
 
 variables = ["Muon_pt_1", "Muon_pt_2", "Electron_pt_1", "Electron_pt_2"]
+unchanged_variables = ["PV_x", "PV_y", "PV_z"]
 
 
 if __name__ == "__main__":
@@ -44,7 +45,7 @@ if __name__ == "__main__":
         report = df.Report()
 
         # Split dataset by event number for training and testing
-        columns = ROOT.std.vector["string"](variables + ['{}_Up'.format(var) for var in variables] + ['{}_Down'.format(var) for var in variables])
+        columns = ROOT.std.vector["string"](variables + ['{}_Up'.format(var) for var in variables] + ['{}_Down'.format(var) for var in variables] + unchanged_variables)
         df.Filter("event % 2 == 0", "Select events with even event number for training")\
           .Snapshot("Events", "train_sys_" + label + ".root", columns)
         df.Filter("event % 2 == 1", "Select events with odd event number for training")\
