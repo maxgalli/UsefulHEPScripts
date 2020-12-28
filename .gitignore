@@ -65,3 +65,6 @@ docs/_build/
 
 # Dask
 dask-worker-space
+
+# Parquet
+*.parquet
