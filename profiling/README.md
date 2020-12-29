@@ -24,4 +24,4 @@ Tools to measure time spent inside functions, with the procedures to use them.
 	 * run ```python -m memory_profiler code_profiling_main.py --dim 1000 --loops 4``` (see [here](https://www.blog.pythonlibrary.org/2016/05/24/python-101-an-intro-to-benchmarking-your-code/) for details )
 
 ## IPython/Jupyter
-See [here](https://jakevdp.github.io/PythonDataScienceHandbook/01.07-timing-and-profiling.html)
+See [here](https://jakevdp.github.io/PythonDataScienceHandbook/01.07-timing-and-profiling.html) for IPython magic commands and [here](https://jiffyclub.github.io/snakeviz/) for Snakeviz.
