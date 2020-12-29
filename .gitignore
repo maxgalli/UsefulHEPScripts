@@ -68,3 +68,8 @@ dask-worker-space
 
 # Parquet
 *.parquet
+
+# Profiling
+*.prof
+*.lprof
+*.svg
