@@ -37,10 +37,10 @@ def setup_logging(output_file, level=logging.DEBUG):
     logger.addHandler(file_handler)
 
 def main(args):
-    cluster = args.cluster_id
-    stream = open('config.yaml','r')
-    inp=yaml.safe_load(stream)
-    dataframes = inp['dataframes']
+    data_EB_input = 'df_data_EB_test.h5'
+    data_EE_input = 'df_data_EE_test.h5'
+    mc_EB_input = 'df_mc_EB_test.h5'
+    mc_EE_input = 'df_mc_EE_test.h5'
 
     ss = ['probeCovarianceIeIp','probeS4','probeR9','probePhiWidth','probeSigmaIeIe','probeEtaWidth']
     ch = ['probeChIso03','probeChIso03worst']
@@ -62,12 +62,12 @@ def main(args):
     # ### Shower Shapes
 
     qrc_EB = qRC(year, 'EB', workDir, ss)
-    qrc_EB.loadMCDF(dataframes['mc']['EB']['input'],0,n_evts,columns=cols)
-    qrc_EB.loadDataDF(dataframes['data']['EB']['input'],0,n_evts,columns=cols)
+    qrc_EB.loadMCDF(mc_EB_input, 0, n_evts, columns=cols)
+    qrc_EB.loadDataDF(data_EB_input, 0, n_evts, columns=cols)
 
     qrc_EE = qRC(year, 'EE', workDir, ss)
-    qrc_EE.loadMCDF(dataframes['mc']['EE']['input'],0,n_evts,columns=cols)
-    qrc_EE.loadDataDF(dataframes['data']['EE']['input'],0,n_evts,columns=cols)
+    qrc_EE.loadMCDF(mc_EE_input, 0, n_evts, columns=cols)
+    qrc_EE.loadDataDF(data_EE_input, 0, n_evts, columns=cols)
 
     for qrc in [qrc_EB, qrc_EE]:
         for var in qrc.vars:
