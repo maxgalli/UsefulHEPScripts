@@ -37,6 +37,8 @@ def setup_logging(output_file, level=logging.DEBUG):
     logger.addHandler(file_handler)
 
 def main(args):
+    cluster = args.cluster_id
+
     data_EB_input = 'df_data_EB_test.h5'
     data_EE_input = 'df_data_EE_test.h5'
     mc_EB_input = 'df_mc_EB_test.h5'
