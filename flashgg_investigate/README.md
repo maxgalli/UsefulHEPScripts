@@ -1,10 +1,27 @@
+## Prepare
+In order to run this tutorial a working installation of [conda](https://docs.conda.io/en/latest/) is needed. Once you have this, follow the instructions to setup the environm
+ent.
+
+### 1. Clone this repository
+```bash
+$ git clone https://github.com/maxgalli/UsefulHEPScripts
+$ cd UsefulHEPScripts/flashgg_investigate
+```
+
+### 2. Create a conda environment
+```bash
+$ conda env create -f environment.yml
+```
+
+# Content
+
 This folder includes useful studies performed to find an optimal structure for the bew flashgg framework.
 
 ## XGBoost -> RDataFrame
-Here we investigate the possibility of  efficiently apply tags and systematics in an RDataFrame analysis flow.  The application would be the new flashgg framework. The idea consists in training a model with XGBoost for some variables and then  apply it, in the context of an RDataFrame flow, to a new dataset which has the  
-same variables the model was trained with plus two "modified" versions (Up and  
-Down, which represent the systematics).  
-  
+Here we investigate the possibility of  efficiently apply tags and systematics in an RDataFrame analysis flow.  The application would be the new flashgg framework. The idea consists in training a model with XGBoost for some variables and then  apply it, in the context of an RDataFrame flow, to a new dataset which has the
+same variables the model was trained with plus two "modified" versions (Up and
+Down, which represent the systematics).
+
 ### Workflow
 * ```prepare_data_with_sys.py```: this program fetches two different remote datasets, ```SMHiggsToZZTo4L.root``` and ```ZZTo2e2mu.root```, which will be respectively our signal and background. Data is processed to flatten the variable of interest (```Muon_pt_1```, ```Muon_pt_2```, ```Electron_pt_1```, ```Electron_pt_2```) and ```Define``` is applied to produce fake branches of systematic variations (variables + ```_Up``` and variables + ```_Down```), for a total amount of 12 branches in each dataset (signal and background). Then, both datasets are split into training and test, ending up with ```train_sys_signal.root```, ```train_sys_background.root```, ```test_sys_signal.root``` and ```test_sys_background.root```.
 * ```train_and_save_models.py```: here we use XGBoost to train a classifiers that separates signal events from background events. The classifier is saved into two different formats: plain XGBoost in ```classifier.pkl``` and in TMVA digestible format as ```myBDT``` inside ```classifier.root```.
@@ -12,3 +29,5 @@ Down, which represent the systematics).
 
 ### Double-check
 Run ```python test_pure_xgb.py > test_pure_xgb.log``` to perform the test for signal dataset using only XGBoost from Python and compare the results.
+
+

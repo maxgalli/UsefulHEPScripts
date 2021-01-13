@@ -1,0 +1,21 @@
+name: flashgg-investigate
+channels:
+  - conda-forge
+dependencies:
+  - python=3.7
+  - jupyterlab>=2.0.0
+  - numpy>=1.18.1
+  - bokeh>=2.0.0
+  - dask=2.20.0
+  - nodejs
+  - distributed=2.20.0
+  - dask-jobqueue
+  - notebook
+  - ipywidgets>=7.5
+  - root
+  - uproot
+  - awkward
+  - aghast
+  - boost-histogram
+  - mplhep
+  - xgboost
