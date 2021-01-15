@@ -48,7 +48,7 @@ def main(args):
     ch = ['probeChIso03','probeChIso03worst']
     ph = ['probePhoIso']
     year = '2018'
-    n_evts = 4700000
+    n_evts = -1
     workDir = '/work/gallim/dataframes/2018'
     weightsDirs = '/work/gallim/weights/2018_mc_full_dask'
 
