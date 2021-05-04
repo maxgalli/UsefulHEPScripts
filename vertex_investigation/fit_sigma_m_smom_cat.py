@@ -5,6 +5,7 @@ import os
 from array import array
 from itertools import combinations
 from scipy.optimize import minimize
+import pickle
 from rich.logging import RichHandler
 
 import logging
@@ -50,8 +51,21 @@ def get_edges(arr, edge_min, edge_max, n_bins):
     return [edge_min] + list(res.x) + [edge_max]
 
 
+def eff_sigma_unc (
+        d_sigma_eff_over_v_gauss, d_sigma_eff_over_v_cb,
+        d_sigma_eff_over_frac,
+        v_v_gauss, v_v_cb, v_frac,
+        cov_v_gauss_v_cb, cov_v_gauss_frac, cov_v_cb_frac):
+
+    var = d_sigma_eff_over_v_gauss**2 * v_v_gauss + d_sigma_eff_over_v_cb**2 * v_v_cb + d_sigma_eff_over_frac**2 * v_frac + 2 * d_sigma_eff_over_v_gauss * d_sigma_eff_over_v_cb * cov_v_gauss_v_cb + 2 * d_sigma_eff_over_v_gauss * d_sigma_eff_over_frac * cov_v_gauss_frac + 2 * d_sigma_eff_over_v_cb * d_sigma_eff_over_frac * cov_v_cb_frac
+
+    return np.sqrt(var)
+
+
 def main():
     logger = setup_logging()
+
+    final_plots_specs = {}
 
         # Needed names for files and trees
     file_dirs = {
@@ -66,7 +80,7 @@ def main():
 
     tree_name = "diphotonDumper/trees/ggH_125_13TeV_All_$SYST"
 
-    output_dir = "/eos/home-g/gallim/www/plots/Hgg/VertexInvestigation/mass_fit_sigmaMOverM"
+    output_dir = "/eos/home-g/gallim/www/plots/Hgg/VertexInvestigation/m_fit_sigmaMOverM"
 
     # Create sigma_m_over_m categories
     logger.info("Creating categories of SigmaMOverM")
@@ -79,6 +93,8 @@ def main():
     smom = "sigma_m" # due to how we defined it in flashgg, it's already divided by M
     for vtx_name, direc in file_format.items():
         categories[vtx_name] = {}
+        final_plots_specs[vtx_name] = {}
+
         arr = uproot.concatenate(["{}:{}".format(direc, tree_name)], expressions=[smom], library="ak")
         arr = np.asarray([ev[0] for ev in arr.to_numpy()])
 
@@ -93,7 +109,12 @@ def main():
             cat_name = "SigmaMOverM_{:.5f}-{:.5f}".format(low, high)
             cat_string = cut_format.format(var=smom, min_edge=low, max_edge=high)
             categories[vtx_name][cat_name] = cat_string
+
+            final_plots_specs[vtx_name][cat_name] = {}
+            final_plots_specs[vtx_name][cat_name]["range"] = (low, high)
+
             low = high
+
     logger.info("Created categories {}".format(categories))
 
     for vtx_name, direc in file_dirs.items():
@@ -135,14 +156,15 @@ def main():
             # Fit in subrange
             mass.setRange("higgs", 120, 130)
             logger.info("Performing fit")
-            fit_result = model.fitTo(data, ROOT.RooFit.Range("higgs"))
+            fit_result = fit_result = model.fitTo(data, ROOT.RooFit.Range("higgs"), ROOT.RooFit.Save(1))
 
             # Plot decoration
             mass_frame = mass.frame(ROOT.RooFit.Title("Mass-{}-{}".format(vtx_name, cat_name)))
             mass_frame.GetYaxis().SetTitleOffset(1.6)
             data.plotOn(mass_frame)
             model.plotOn(mass_frame, ROOT.RooFit.LineColor(getattr(ROOT, fit_colors[vtx_name])))
-            #chi_sq = mass_frame.chiSquare() / model.getParameters(data).getSize()
+            model.plotOn(mass_frame, ROOT.RooFit.Components("gauss"), ROOT.RooFit.LineColor(ROOT.kCyan))
+            model.plotOn(mass_frame, ROOT.RooFit.Components("cb"), ROOT.RooFit.LineColor(ROOT.kBlue))
             chi_sq = mass_frame.chiSquare()
             model.paramOn(mass_frame, ROOT.RooFit.Layout(0.65), ROOT.RooFit.Label("chiSq / ndof = {:.5f}".format(chi_sq)))
             data.statOn(mass_frame, ROOT.RooFit.Layout(0.46, 0.12, 0.95))
@@ -154,7 +176,46 @@ def main():
             c.SaveAs("{}/mass_{}_{}.png".format(output_dir, vtx_name, cat_name))
             c.SaveAs("{}/mass_{}_{}.pdf".format(output_dir, vtx_name, cat_name))
 
+            # Fill values for final plots
+            parameters = {var.GetName(): var.getVal() for var in list(model.getParameters(data))}
+
+            # See https://root-forum.cern.ch/t/how-to-calculate-effective-sigma/39472/3
+            final_plots_specs[vtx_name][cat_name]["fitted_sigma"] = np.sqrt(
+                    (parameters["sigma"]**2)*parameters["frac"] \
+                    + (parameters["sigma_cb"]**2)*(1 - parameters["frac"])
+                    )
+            
+            # Propagate uncertainty on sigma effective
+
+            # To get the covariances from fit result, remember the indexes
+            cov_matrix = fit_result.covarianceMatrix()
+            frac_index = 1
+            sigma_gauss_index = 5
+            sigma_cb_index = 6
+
+            var_frac = cov_matrix[frac_index][frac_index]
+            var_v_gauss = cov_matrix[sigma_gauss_index][sigma_gauss_index]
+            var_cb_index = cov_matrix[sigma_cb_index][sigma_cb_index]
+
+            cov_v_gauss_v_cb = cov_matrix[sigma_gauss_index][sigma_cb_index]
+            cov_v_gauss_frac = cov_matrix[sigma_gauss_index][frac_index]
+            cov_v_cb_frac = cov_matrix[sigma_cb_index][frac_index]
+           
+
+            final_plots_specs[vtx_name][cat_name]["fitted_sigma_unc"] = eff_sigma_unc(
+                    parameters["frac"], 
+                    1 - parameters["frac"], 
+                    parameters["sigma"] - parameters["sigma_cb"],
+                    var_v_gauss, var_cb_index, var_frac,
+                    cov_v_gauss_v_cb, cov_v_gauss_frac, cov_v_cb_frac
+                    )
+
             del mu, sigma, mu_cb, sigma_cb, alpha, n, frac, gauss, cb, model, fit_result, mass_frame
+
+    logger.info("Dumping final plots specifications: {}".format(final_plots_specs))
+
+    with open("sigma_m_final_plots_specs.pkl", "wb") as fl:
+        pickle.dump(final_plots_specs, fl)
 
 
 
