@@ -5,20 +5,29 @@ import numpy as np
 import mplhep as hep
 import ROOT
 
+from utils import parse_arguments
+from utils import file_names_tmpl
+from utils import tree_name
+from utils import setup_logging
+
 hep.set_style("CMS")
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 
 def count_fraction(awk_arr, var, limits):
-    """ Given an awkward array, a variable (will be p_t) and a list of ranges (i.e. list of 2-tuples), loop over the ranges
-    to compute the fraction of events with diff_z < 1. (cm) in every range of var.
+    """ Given an awkward array, a variable (will be p_t) and a list of values (i.e. list of lists of variable length), loop over these values
+    to compute the fraction of events with diff_z < 1. (cm).
     Return two lists containing the computed values (for each range) and theis uncertainties.
     Uncertainties are computed using ROOT.TEfficiency.ClopperPearson, and it is thus a list of elements [low, up]
     """
     vals = []
     uncs = []
     for rng in limits:
-        part_arr = awk_arr[[i in rng for i in awk_arr[var]]]
+        logger.info("Working with number of vertexes {}".format(rng))
+        part_arr = awk_arr[[i in rng for i in awk_arr[var]]] # Highly inefficient but no better solution found
         part_arr['diff_z'] = abs(part_arr.gen_vtx_z - part_arr.vtx_z)
         total = len(part_arr)
         passed = len(part_arr[part_arr.diff_z < 1.])
@@ -37,22 +46,27 @@ def rel_diff(a, b):
     return abs(a - b) / max(a, b)
 
 
-def main():
+def main(args):
+    logger = setup_logging()
+
+    v0_input_dir = args.v0_input_dir
+    vcustom_input_dir = args.vcustom_input_dir
+    output_dir = args.output_dir
+    channel = args.channel
+
+    # Needed names for files and trees
+    v0_file = v0_input_dir + "/" + file_names_tmpl[channel]
+    v_custom_file = vcustom_input_dir + "/" + file_names_tmpl[channel]
+
     ranges = {
             "nvtx": {
-                "range": (0, 70),
+                "range": (0, 60),
                 "label": "$N_{vertices}$"
                 }
             }
 
-    # Needed names for files and trees
-    v0_file = "/work/gallim/root_files/vertex_investigation/VertexInvestigation_vtx0/output_GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8_storeWeights_alesauva-UL2018_0-10_6_4-v0-RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v1-3f96409841a3cc85b911eb441562baae_USER_*.root"
-    v_custom_file = "/work/gallim/root_files/vertex_investigation/VertexInvestigation/output_GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8_storeWeights_alesauva-UL2018_0-10_6_4-v0-RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v1-3f96409841a3cc85b911eb441562baae_USER_*.root"
-
-    tree_name = "diphotonDumper/trees/ggH_125_13TeV_All_$SYST"
-
     for var, specs in ranges.items():
-        print("Working with {}".format(var))
+        logger.info("Working with {}".format(var))
 
         # Read two trees lazily
         imp_variables = [var] + ["vtx_z", "gen_vtx_z", "weight"]
@@ -65,13 +79,13 @@ def main():
 
         var_ranges = []
         start = 0
-        step = 3
+        step =  2
         for i in range(*specs["range"], step):
             var_ranges.append([i + s for s in range(step)])
             start = i
 
         x_vtx0, x_vtxc, y_vtx0, y_vtxc = {}, {}, {}, {}
-        xs = [np.mean(rng) for rng in var_ranges]
+        xs = [rng[:-1] for rng in var_ranges]
         x_vtx0["values"] = xs
         x_vtxc["values"] = xs
         x_vtx0["unc"] = np.zeros(len(var_ranges))
@@ -106,7 +120,7 @@ def main():
                 yerr = np.array(list(zip(rdiff_err_low, rdiff_err_up))).T,
                 fmt='ko'
             )
-        ax.legend(fontsize=18, loc="lower right")
+        ax.legend(fontsize=18, loc="lower left")
         rax.set_xlabel(specs["label"])
         ax.set_ylabel("Fraction of |$Z_{reco}$ - $Z_{true}$| < 10 mm")
         rax.set_ylabel("$rel\ diff$")
@@ -114,13 +128,14 @@ def main():
         ax.set_xlim(left=0.)
         rax.set_ylim(0., 0.3)
 
-        output_dir = "/eos/home-g/gallim/www/plots/Hgg/VertexInvestigation/id_efficiency"
         output_name = "{}_id_efficiency".format(var)
         hep.cms.label(loc=0, data=True, llabel="Work in Progress", rlabel="", ax=ax, pad=.05)
-        fig.savefig("{}/{}.png".format(output_dir, output_name), bbox_inches='tight')
-        fig.savefig("{}/{}.pdf".format(output_dir, output_name), bbox_inches='tight')
+        fig.savefig("{}/{}_.png".format(output_dir, output_name), bbox_inches='tight')
+        fig.savefig("{}/{}_.pdf".format(output_dir, output_name), bbox_inches='tight')
 
+        logger.info("Dumped plot in {}".format(output_dir))
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    main(args)

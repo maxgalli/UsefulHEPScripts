@@ -6,23 +6,14 @@ from array import array
 from itertools import combinations
 from scipy.optimize import minimize
 import pickle
-from rich.logging import RichHandler
+
+from utils import parse_arguments
+from utils import file_names_tmpl
+from utils import tree_name
+from utils import setup_logging
 
 import logging
 logger = logging.getLogger(__name__)
-
-
-def setup_logging(level=logging.INFO):
-    logger = logging.getLogger()
-
-    logger.setLevel(level)
-    formatter = logging.Formatter("%(message)s")
-
-    stream_handler = RichHandler(show_time=False, rich_tracebacks=True)
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-
-    return logger
 
 
 def get_edges(arr, edge_min, edge_max, n_bins):
@@ -51,7 +42,7 @@ def get_edges(arr, edge_min, edge_max, n_bins):
     return [edge_min] + list(res.x) + [edge_max]
 
 
-def eff_sigma_unc (
+def eff_sigma_unc(
         d_sigma_eff_over_v_gauss, d_sigma_eff_over_v_cb,
         d_sigma_eff_over_frac,
         v_v_gauss, v_v_cb, v_frac,
@@ -62,15 +53,20 @@ def eff_sigma_unc (
     return np.sqrt(var)
 
 
-def main():
+def main(args):
     logger = setup_logging()
+
+    v0_input_dir = args.v0_input_dir
+    vcustom_input_dir = args.vcustom_input_dir
+    output_dir = args.output_dir
+    channel = args.channel
 
     final_plots_specs = {}
 
-        # Needed names for files and trees
+    # Needed names for files and trees
     file_dirs = {
-            "v0": "/work/gallim/root_files/vertex_investigation/VertexInvestigation_vtx0",
-            "vcustom": "/work/gallim/root_files/vertex_investigation/VertexInvestigation"
+            "v0": v0_input_dir,
+            "vcustom": vcustom_input_dir
             }
 
     fit_colors = {
@@ -78,15 +74,11 @@ def main():
             "vcustom": "kRed"
             }
 
-    tree_name = "diphotonDumper/trees/ggH_125_13TeV_All_$SYST"
-
-    output_dir = "/eos/home-g/gallim/www/plots/Hgg/VertexInvestigation/m_fit_sigmaMOverM"
-
     # Create sigma_m_over_m categories
     logger.info("Creating categories of SigmaMOverM")
     file_format = {
-            "v0": "/work/gallim/root_files/vertex_investigation/VertexInvestigation_vtx0/output_GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8_storeWeights_alesauva-UL2018_0-10_6_4-v0-RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v1-3f96409841a3cc85b911eb441562baae_USER_*.root",
-            "vcustom": "/work/gallim/root_files/vertex_investigation/VertexInvestigation/output_GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8_storeWeights_alesauva-UL2018_0-10_6_4-v0-RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v1-3f96409841a3cc85b911eb441562baae_USER_*.root"
+            "v0": v0_input_dir + "/" + file_names_tmpl[channel],
+            "vcustom": vcustom_input_dir + "/" + file_names_tmpl[channel]
             }
 
     categories = {}
@@ -123,20 +115,26 @@ def main():
             logger.info("Working with category {}".format(cat_name))
 
             chain = ROOT.TChain()
-            for fl in os.listdir(direc):
+            files = [fl for fl in os.listdir(direc) if fl.startswith(file_names_tmpl[channel][:20])]
+            for fl in files:
                 chain.Add("{}/{}/{}".format(direc, fl, tree_name))
             rdf = ROOT.RDataFrame(chain)
             rdf_cut = rdf.Filter(cut)
             mass_arr = rdf_cut.Take[float]("mass").GetValue()
+            weight_arr = rdf_cut.Take[float]("weight").GetValue()
             mass_fake_arr = array("d", [0.])
+            weight_fake_arr = array("d", [0.])
             cut_tree = ROOT.TTree("cut_tree", "cut_tree")
             cut_tree.Branch("mass", mass_fake_arr, "mass/D")
-            for ev in mass_arr:
-                mass_fake_arr[0] = ev
+            cut_tree.Branch("weight", weight_fake_arr, "weight/D")
+            for ev_mass, ev_weight in zip(mass_arr, weight_arr):
+                mass_fake_arr[0] = ev_mass
+                weight_fake_arr[0] = ev_weight
                 cut_tree.Fill()
 
             # RooFit objects
             mass = ROOT.RooRealVar("mass", "Invariant mass [GeV]", 125, 115, 135)
+            weight = ROOT.RooRealVar("weight", "weight", -1, 1)
             mu = ROOT.RooRealVar("mu", "mu", 125, 120, 130)
             sigma = ROOT.RooRealVar("sigma", "sigma", 1, 0.1, 10)
             mu_cb = ROOT.RooRealVar("mu_cb", "mu_cb", 125, 120, 130)
@@ -150,21 +148,24 @@ def main():
 
             model = ROOT.RooAddPdf("model", "model", ROOT.RooArgList(gauss, cb), ROOT.RooArgList(frac))
 
-            # Create dataset
-            data = ROOT.RooDataSet("data".format(cat_name), "data".format(cat_name), cut_tree, ROOT.RooArgSet(mass))
+            # Create (weighted) dataset
+            data = ROOT.RooDataSet("data".format(cat_name), "data".format(cat_name), cut_tree, ROOT.RooArgSet(mass, weight), "", weight.GetName())
 
             # Fit in subrange
             mass.setRange("higgs", 120, 130)
             logger.info("Performing fit")
-            fit_result = fit_result = model.fitTo(data, ROOT.RooFit.Range("higgs"), ROOT.RooFit.Save(1))
+            fit_result = fit_result = model.fitTo(
+                    data, 
+                    ROOT.RooFit.Range("higgs"), 
+                    ROOT.RooFit.Save(1),
+                    ROOT.RooFit.AsymptoticError(1)
+                    )
 
             # Plot decoration
             mass_frame = mass.frame(ROOT.RooFit.Title("Mass-{}-{}".format(vtx_name, cat_name)))
             mass_frame.GetYaxis().SetTitleOffset(1.6)
-            data.plotOn(mass_frame)
+            data.plotOn(mass_frame, ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2))
             model.plotOn(mass_frame, ROOT.RooFit.LineColor(getattr(ROOT, fit_colors[vtx_name])))
-            model.plotOn(mass_frame, ROOT.RooFit.Components("gauss"), ROOT.RooFit.LineColor(ROOT.kCyan))
-            model.plotOn(mass_frame, ROOT.RooFit.Components("cb"), ROOT.RooFit.LineColor(ROOT.kBlue))
             chi_sq = mass_frame.chiSquare()
             model.paramOn(mass_frame, ROOT.RooFit.Layout(0.65), ROOT.RooFit.Label("chiSq / ndof = {:.5f}".format(chi_sq)))
             data.statOn(mass_frame, ROOT.RooFit.Layout(0.46, 0.12, 0.95))
@@ -214,10 +215,11 @@ def main():
 
     logger.info("Dumping final plots specifications: {}".format(final_plots_specs))
 
-    with open("sigma_m_final_plots_specs.pkl", "wb") as fl:
+    with open("sigma_m_final_plots_specs_{}.pkl".format(channel), "wb") as fl:
         pickle.dump(final_plots_specs, fl)
 
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    main(args)

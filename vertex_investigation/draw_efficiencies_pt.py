@@ -5,7 +5,15 @@ import numpy as np
 import mplhep as hep
 import ROOT
 
+from utils import parse_arguments
+from utils import file_names_tmpl
+from utils import tree_name
+from utils import setup_logging
+
 hep.set_style("CMS")
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 
@@ -18,6 +26,7 @@ def count_fraction(awk_arr, var, limits):
     vals = []
     uncs = []
     for rng in limits:
+        logger.info("Working with range {}".format(rng))
         part_arr = awk_arr[(awk_arr[var] > rng[0]) & (awk_arr[var] < rng[1])]
         part_arr['diff_z'] = abs(part_arr.gen_vtx_z - part_arr.vtx_z)
         total = len(part_arr)
@@ -37,7 +46,18 @@ def rel_diff(a, b):
     return abs(a - b) / max(a, b)
 
 
-def main():
+def main(args):
+    logger = setup_logging()
+
+    v0_input_dir = args.v0_input_dir
+    vcustom_input_dir = args.vcustom_input_dir
+    output_dir = args.output_dir
+    channel = args.channel
+
+    # Needed names for files and trees
+    v0_file = v0_input_dir + "/" + file_names_tmpl[channel]
+    v_custom_file = vcustom_input_dir + "/" + file_names_tmpl[channel]
+
     ranges = {
             "pt": {
                 "range": (0, 300),
@@ -45,14 +65,8 @@ def main():
                 },
             }
 
-    # Needed names for files and trees
-    v0_file = "/work/gallim/root_files/vertex_investigation/VertexInvestigation_vtx0/output_GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8_storeWeights_alesauva-UL2018_0-10_6_4-v0-RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v1-3f96409841a3cc85b911eb441562baae_USER_*.root"
-    v_custom_file = "/work/gallim/root_files/vertex_investigation/VertexInvestigation/output_GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8_storeWeights_alesauva-UL2018_0-10_6_4-v0-RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v1-3f96409841a3cc85b911eb441562baae_USER_*.root"
-
-    tree_name = "diphotonDumper/trees/ggH_125_13TeV_All_$SYST"
-
     for var, specs in ranges.items():
-        print("Working with {}".format(var))
+        logger.info("Working with {}".format(var))
 
         # Read two trees lazily
         imp_variables = [var] + ["vtx_z", "gen_vtx_z", "weight"]
@@ -114,13 +128,15 @@ def main():
         ax.set_xlim(left=0.)
         rax.set_ylim(0., 0.3)
 
-        output_dir = "/eos/home-g/gallim/www/plots/Hgg/VertexInvestigation/id_efficiency"
         output_name = "{}_id_efficiency".format(var)
         hep.cms.label(loc=0, data=True, llabel="Work in Progress", rlabel="", ax=ax, pad=.05)
         fig.savefig("{}/{}.png".format(output_dir, output_name), bbox_inches='tight')
         fig.savefig("{}/{}.pdf".format(output_dir, output_name), bbox_inches='tight')
 
+        logger.info("Dumped plot in {}".format(output_dir))
+
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    main(args)

@@ -3,6 +3,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import mplhep as hep
 
+from utils import parse_arguments
+from utils import file_names_tmpl
+from utils import tree_name
+from utils import setup_logging
+
+import logging
+logger = logging.getLogger(__name__)
+
 hep.set_style("CMS")
 
 
@@ -10,9 +18,14 @@ hep.set_style("CMS")
 def rel_diff(a, b):
     return abs(a - b) / max(a, b)
 
-def main():
-    pkl_name = "sigma_m_final_plots_specs.pkl"
-    output_dir = "/eos/home-g/gallim/www/plots/Hgg/VertexInvestigation/m_fit_sigmaMOverM"
+def main(args):
+    logger = setup_logging()
+
+    output_dir = args.output_dir
+    channel = args.channel
+
+    pkl_name = "sigma_m_final_plots_specs_{}.pkl".format(channel)
+    logger.info("Found file {}".format(pkl_name))
 
     with open(pkl_name, "rb") as fl:
         plots_specs = pickle.load(fl)
@@ -78,4 +91,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    main(args)
