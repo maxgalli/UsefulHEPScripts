@@ -7,8 +7,9 @@ import ROOT
 
 from utils import parse_arguments
 from utils import file_names_tmpl
-from utils import tree_name
+from utils import tree_name_tmpl
 from utils import setup_logging
+from utils.plotting_specs import y_lims
 
 hep.set_style("CMS")
 
@@ -53,6 +54,8 @@ def main(args):
     vcustom_input_dir = args.vcustom_input_dir
     output_dir = args.output_dir
     channel = args.channel
+
+    tree_name = tree_name_tmpl.format(channel)
 
     # Needed names for files and trees
     v0_file = v0_input_dir + "/" + file_names_tmpl[channel]
@@ -124,14 +127,15 @@ def main(args):
         rax.set_xlabel(specs["label"])
         ax.set_ylabel("Fraction of |$Z_{reco}$ - $Z_{true}$| < 10 mm")
         rax.set_ylabel("$rel\ diff$")
-        ax.set_ylim(bottom=0.)
-        ax.set_xlim(left=0.)
-        rax.set_ylim(0., 0.3)
+        ax.set_ylim(*y_lims[var][channel]["ax"])
+        rax.set_ylim(*y_lims[var][channel]["rax"])
+        ax.set_xlim(left=-1)
+        rax.set_xlim(left=-1)
 
         output_name = "{}_id_efficiency".format(var)
         hep.cms.label(loc=0, data=True, llabel="Work in Progress", rlabel="", ax=ax, pad=.05)
-        fig.savefig("{}/{}_.png".format(output_dir, output_name), bbox_inches='tight')
-        fig.savefig("{}/{}_.pdf".format(output_dir, output_name), bbox_inches='tight')
+        fig.savefig("{}/{}.jpg".format(output_dir, output_name), bbox_inches='tight')
+        fig.savefig("{}/{}.pdf".format(output_dir, output_name), bbox_inches='tight')
 
         logger.info("Dumped plot in {}".format(output_dir))
 

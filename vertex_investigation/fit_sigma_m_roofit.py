@@ -4,7 +4,7 @@ from array import array
 
 from utils import parse_arguments
 from utils import file_names_tmpl
-from utils import tree_name
+from utils import tree_name_tmpl
 from utils import setup_logging
 
 import logging
@@ -18,6 +18,8 @@ def main(args):
     vcustom_input_dir = args.vcustom_input_dir
     output_dir = args.output_dir
     channel = args.channel
+
+    tree_name = tree_name_tmpl.format(channel)
 
     # Needed names for files and trees
     file_dirs = {
@@ -97,7 +99,7 @@ def main(args):
             model.plotOn(mass_frame, ROOT.RooFit.LineColor(getattr(ROOT, fit_colors[vtx_name])))
             chi_sq = mass_frame.chiSquare()
             model.paramOn(mass_frame, ROOT.RooFit.Layout(0.65), ROOT.RooFit.Label("chiSq / ndof = {:.5f}".format(chi_sq)))
-            data.statOn(mass_frame, ROOT.RooFit.Layout(0.46, 0.12, 0.95))
+            #data.statOn(mass_frame, ROOT.RooFit.Layout(0.46, 0.12, 0.95))
 
             # Dump plots
             logger.info("Dumping plots")

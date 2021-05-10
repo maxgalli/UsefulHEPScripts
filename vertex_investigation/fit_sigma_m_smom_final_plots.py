@@ -5,7 +5,6 @@ import mplhep as hep
 
 from utils import parse_arguments
 from utils import file_names_tmpl
-from utils import tree_name
 from utils import setup_logging
 
 import logging
@@ -82,7 +81,7 @@ def main(args):
     rax.set_ylabel("$rel\ diff$")
     ax.set_xlim(0.)
     ax.set_ylim(0.)
-    rax.set_ylim(0., 0.2)
+    rax.set_ylim(-0.01, 0.2)
     ax.legend()
     hep.cms.label(loc=0, data=True, llabel="Work in Progress", rlabel="", ax=ax, pad=.05)
     fig.savefig("{}/allbin.png".format(output_dir), bbox_inches='tight')

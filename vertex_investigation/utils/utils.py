@@ -52,10 +52,10 @@ def parse_arguments():
 
 file_names_tmpl = {
         "ggH": "output_GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8_storeWeights_alesauva-UL2018_0-10_6_4-v0-RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v1-3f96409841a3cc85b911eb441562baae_USER_*.root",
-        "VBF": None,
-        "VH": None,
-        "ttH": None
+        "vbf": "output_VBFHToGG_M125_TuneCP5_13TeV-amcatnlo-pythia8_storeWeights_alesauva-UL2018_0-10_6_4-v0-RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v2-cd53024353ab74068d5c62af34cd5d53_USER_*.root",
+        "vh": "output_VHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_alesauva-UL2018_0-10_6_4-v0-RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v1-4e4629d24fb44591ff8ab61ece79898c_USER_*.root",
+        "tth": "output_ttHJetToGG_M125_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_storeWeights_alesauva-UL2018_0-10_6_4-v0-RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v1-3fde8d2608442ffb74ed8d18d363b700_USER_*.root"
         }
 
 
-tree_name = "diphotonDumper/trees/ggH_125_13TeV_All_$SYST"
+tree_name_tmpl = "diphotonDumper/trees/{}_125_13TeV_All_$SYST"
