@@ -73,3 +73,6 @@ dask-worker-space
 *.prof
 *.lprof
 *.svg
+
+# VisualStudioCode
+*.code-workspace
