@@ -60,6 +60,17 @@ def main(args):
     vcustom_input_dir = args.vcustom_input_dir
     output_dir = args.output_dir
     channel = args.channel
+    # Fit to sum of CB and gauss or simple gauss
+    shape = args.shape
+
+    if shape == "combo":
+        logger.info("Fit to combination of Gaussian and Double Crystal Ball")
+    elif shape == "gaussian":
+        logger.info("Fit to Gaussian")
+    elif shape == "crystal_ball":
+        logger.info("Fit to Double Crystal Ball")
+    else:
+        raise ValueError("Something went wrong")
 
     tree_name = tree_name_tmpl.format(channel)
 
@@ -139,16 +150,23 @@ def main(args):
             weight = ROOT.RooRealVar("weight", "weight", -1, 1)
             mu = ROOT.RooRealVar("mu", "mu", 125, 120, 130)
             sigma = ROOT.RooRealVar("sigma", "sigma", 1, 0.1, 10)
+
+            gauss = ROOT.RooGaussian("gauss", "gauss", mass, mu, sigma)
+
             mu_cb = ROOT.RooRealVar("mu_cb", "mu_cb", 125, 120, 130)
             sigma_cb = ROOT.RooRealVar("sigma_cb", "sigma_cb", 4, 0.1, 10)
             alpha = ROOT.RooRealVar("alpha", "alpha", 1, 0, 10)
             n = ROOT.RooRealVar("n", "n", 1, 0, 5)
             frac = ROOT.RooRealVar("frac", "frac", 0.5, 0., 1.)
 
-            gauss = ROOT.RooGaussian("gauss", "gauss", mass, mu, sigma)
             cb = ROOT.RooCBShape("cb", "cb", mass, mu_cb, sigma_cb, alpha, n)
 
-            model = ROOT.RooAddPdf("model", "model", ROOT.RooArgList(gauss, cb), ROOT.RooArgList(frac))
+            if shape == "gaussian":
+                model = gauss
+            elif shape == "crystal_ball":
+                model = cb
+            else:
+                model = ROOT.RooAddPdf("model", "model", ROOT.RooArgList(gauss, cb), ROOT.RooArgList(frac))
 
             # Create (weighted) dataset
             data = ROOT.RooDataSet("data".format(cat_name), "data".format(cat_name), cut_tree, ROOT.RooArgSet(mass, weight), "", weight.GetName())
@@ -170,51 +188,57 @@ def main(args):
             model.plotOn(mass_frame, ROOT.RooFit.LineColor(getattr(ROOT, fit_colors[vtx_name])))
             chi_sq = mass_frame.chiSquare()
             model.paramOn(mass_frame, ROOT.RooFit.Layout(0.65), ROOT.RooFit.Label("chiSq / ndof = {:.5f}".format(chi_sq)))
-            #data.statOn(mass_frame, ROOT.RooFit.Layout(0.46, 0.12, 0.95))
 
             # Dump plots
             logger.info("Dumping plots")
             c = ROOT.TCanvas("", "")
             mass_frame.Draw()
-            c.SaveAs("{}/mass_{}_{}.png".format(output_dir, vtx_name, cat_name))
+            c.SaveAs("{}/mass_{}_{}.jpg".format(output_dir, vtx_name, cat_name))
             c.SaveAs("{}/mass_{}_{}.pdf".format(output_dir, vtx_name, cat_name))
 
             # Fill values for final plots
             parameters = {var.GetName(): var.getVal() for var in list(model.getParameters(data))}
 
-            # See https://root-forum.cern.ch/t/how-to-calculate-effective-sigma/39472/3
-            final_plots_specs[vtx_name][cat_name]["fitted_sigma"] = np.sqrt(
-                    (parameters["sigma"]**2)*parameters["frac"] \
-                    + (parameters["sigma_cb"]**2)*(1 - parameters["frac"])
-                    )
+            if shape == "combo":
+                # See https://root-forum.cern.ch/t/how-to-calculate-effective-sigma/39472/3
+                final_plots_specs[vtx_name][cat_name]["fitted_sigma"] = np.sqrt(
+                        (parameters["sigma"]**2)*parameters["frac"] \
+                        + (parameters["sigma_cb"]**2)*(1 - parameters["frac"])
+                        )
+                # Propagate uncertainty on sigma effective
+                # To get the covariances from fit result, remember the indexes
+                cov_matrix = fit_result.covarianceMatrix()
+                frac_index = 1
+                sigma_gauss_index = 5
+                sigma_cb_index = 6
+
+                var_frac = cov_matrix[frac_index][frac_index]
+                var_v_gauss = cov_matrix[sigma_gauss_index][sigma_gauss_index]
+                var_cb_index = cov_matrix[sigma_cb_index][sigma_cb_index]
+
+                cov_v_gauss_v_cb = cov_matrix[sigma_gauss_index][sigma_cb_index]
+                cov_v_gauss_frac = cov_matrix[sigma_gauss_index][frac_index]
+                cov_v_cb_frac = cov_matrix[sigma_cb_index][frac_index]
+
+
+                final_plots_specs[vtx_name][cat_name]["fitted_sigma_unc"] = eff_sigma_unc(
+                        parameters["frac"], 
+                        1 - parameters["frac"], 
+                        parameters["sigma"] - parameters["sigma_cb"],
+                        var_v_gauss, var_cb_index, var_frac,
+                        cov_v_gauss_v_cb, cov_v_gauss_frac, cov_v_cb_frac
+                        )
+
+            else:
+                if shape == "gaussian":
+                    final_plots_specs[vtx_name][cat_name]["fitted_sigma"] = parameters["sigma"]
+                else:
+                    final_plots_specs[vtx_name][cat_name]["fitted_sigma"] = parameters["sigma_cb"]
+                cov_matrix = fit_result.covarianceMatrix()
+                sigma_index = 1
+                var_sigma = cov_matrix[sigma_index][sigma_index]
+                final_plots_specs[vtx_name][cat_name]["fitted_sigma_unc"] = np.sqrt(var_sigma)
             
-            # Propagate uncertainty on sigma effective
-
-            # To get the covariances from fit result, remember the indexes
-            cov_matrix = fit_result.covarianceMatrix()
-            frac_index = 1
-            sigma_gauss_index = 5
-            sigma_cb_index = 6
-
-            var_frac = cov_matrix[frac_index][frac_index]
-            var_v_gauss = cov_matrix[sigma_gauss_index][sigma_gauss_index]
-            var_cb_index = cov_matrix[sigma_cb_index][sigma_cb_index]
-
-            cov_v_gauss_v_cb = cov_matrix[sigma_gauss_index][sigma_cb_index]
-            cov_v_gauss_frac = cov_matrix[sigma_gauss_index][frac_index]
-            cov_v_cb_frac = cov_matrix[sigma_cb_index][frac_index]
-           
-
-            final_plots_specs[vtx_name][cat_name]["fitted_sigma_unc"] = eff_sigma_unc(
-                    parameters["frac"], 
-                    1 - parameters["frac"], 
-                    parameters["sigma"] - parameters["sigma_cb"],
-                    var_v_gauss, var_cb_index, var_frac,
-                    cov_v_gauss_v_cb, cov_v_gauss_frac, cov_v_cb_frac
-                    )
-
-            del mu, sigma, mu_cb, sigma_cb, alpha, n, frac, gauss, cb, model, fit_result, mass_frame
-
     logger.info("Dumping final plots specifications: {}".format(final_plots_specs))
 
     with open("sigma_m_final_plots_specs_{}.pkl".format(channel), "wb") as fl:
