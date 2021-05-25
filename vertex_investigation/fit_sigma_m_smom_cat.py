@@ -68,7 +68,7 @@ def main(args):
     elif shape == "gaussian":
         logger.info("Fit to Gaussian")
     elif shape == "crystal_ball":
-        logger.info("Fit to Double Crystal Ball")
+        logger.info("Fit to Crystal Ball")
     else:
         raise ValueError("Something went wrong")
 
