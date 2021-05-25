@@ -1,6 +1,7 @@
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
+from uncertainties import ufloat
 import mplhep as hep
 
 from utils import parse_arguments
@@ -15,7 +16,11 @@ hep.set_style("CMS")
 
 
 def rel_diff(a, b):
-    return abs(a - b) / max(a, b)
+    num = a - b
+    num = abs(num)
+    den = a if a.n > b.n else b
+
+    return num / den
 
 def main(args):
     logger = setup_logging()
@@ -57,17 +62,16 @@ def main(args):
                 label=vtx_name
                 )
     rax_y = [rel_diff(s0, sc) for s0, sc in zip(
-        [cat_spec["fitted_sigma"] for cat_spec in plots_specs["v0"].values()],
-        [cat_spec["fitted_sigma"] for cat_spec in plots_specs["vcustom"].values()])
+        [ufloat(cat_spec["fitted_sigma"], cat_spec["fitted_sigma_unc"]) for cat_spec in plots_specs["v0"].values()],
+        [ufloat(cat_spec["fitted_sigma"], cat_spec["fitted_sigma_unc"]) for cat_spec in plots_specs["vcustom"].values()])
         ]
-    rax_y_rel_unc = [
-            np.sqrt((v0_specs["fitted_sigma_unc"] / v0_specs["fitted_sigma"])**2 \
-                    + (vcustom_specs["fitted_sigma_unc"]/vcustom_specs["fitted_sigma"])**2) for v0_specs, vcustom_specs in zip(list(plots_specs["v0"].values()), list(plots_specs["vcustom"].values()))]
-    rax_y_abs_unc = [val*unc for val, unc in zip(rax_y, rax_y_rel_unc)]
+
+    logger.info("Relative differences: {}".format(rax_y))
+
     rax.errorbar(
             x_s["v0"], 
-            rax_y,
-            yerr = rax_y_abs_unc,
+            [val.n for val in rax_y],
+            yerr = [val.s for val in rax_y],
             fmt="ko"
             )
 
@@ -82,9 +86,9 @@ def main(args):
     ax.set_xlim(0.)
     ax.set_ylim(0.)
     rax.set_ylim(-0.01, 0.2)
-    ax.legend()
+    ax.legend(loc="upper left")
     hep.cms.label(loc=0, data=True, llabel="Work in Progress", rlabel="", ax=ax, pad=.05)
-    fig.savefig("{}/allbin.png".format(output_dir), bbox_inches='tight')
+    fig.savefig("{}/allbin.jpg".format(output_dir), bbox_inches='tight')
     fig.savefig("{}/allbin.pdf".format(output_dir), bbox_inches='tight')
 
 
