@@ -78,20 +78,20 @@ def main(args):
 
     # Needed names for files and trees
     file_dirs = {
-            "v0": v0_input_dir,
-            "vcustom": vcustom_input_dir
+            "Vertex 0th": v0_input_dir,
+            "Vertex Reco": vcustom_input_dir
             }
 
     fit_colors = {
-            "v0": "kGreen",
-            "vcustom": "kRed"
+            "Vertex 0th": "kRed",
+            "Vertex Reco": "kBlue"
             }
 
     # Create sigma_m_over_m categories
     logger.info("Creating categories of SigmaMOverM")
     file_format = {
-            "v0": v0_input_dir + "/" + file_names_tmpl[channel],
-            "vcustom": vcustom_input_dir + "/" + file_names_tmpl[channel]
+            "Vertex 0th": v0_input_dir + "/" + file_names_tmpl[channel],
+            "Vertex Reco": vcustom_input_dir + "/" + file_names_tmpl[channel]
             }
 
     categories = {}
@@ -172,7 +172,7 @@ def main(args):
             data = ROOT.RooDataSet("data".format(cat_name), "data".format(cat_name), cut_tree, ROOT.RooArgSet(mass, weight), "", weight.GetName())
 
             # Fit in subrange
-            mass.setRange("higgs", 120, 130)
+            mass.setRange("higgs", 116, 134)
             logger.info("Performing fit")
             fit_result = fit_result = model.fitTo(
                     data, 
