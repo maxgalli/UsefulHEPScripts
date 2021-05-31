@@ -1,4 +1,5 @@
 import argparse
+import numpy as np
 from rich.logging import RichHandler
 
 import logging
@@ -67,3 +68,36 @@ file_names_tmpl = {
 
 
 tree_name_tmpl = "diphotonDumper/trees/{}_125_13TeV_All_$SYST"
+
+
+def rel_diff_asymm(a, b, a_uncs, b_uncs):
+    """ Compute relative difference between two quantities with asymmetric uncertaintes.
+    a and b are the two values, *_uncs are the uncertainties of value * in the format [low, up]
+    
+    Return a result in the same format (i.e. a tuple (val, [val_low, val_up]))
+    """
+    a_low, a_up = a_uncs
+    b_low, b_up = b_uncs
+
+    num = abs(a - b)
+    den = max(a, b)
+
+    val = num / den
+
+    num_low = np.sqrt(a_low**2 + b_low**2)
+    num_up = np.sqrt(a_up**2 + b_up**2)
+
+    if den == a:
+        den_low = a_low
+        den_up = a_up
+    elif den == b:
+        den_low = b_low
+        den_up = b_up
+    else:
+        raise ValueError("Something went wrong during relative difference computation with asymmetric uncertainties.")
+
+    val_low = val * np.sqrt((num_low / num)**2 + (den_low / den)**2)
+    val_up = val * np.sqrt((num_up / num)**2 + (den_up / den)**2)
+
+    return val, (val_low, val_up)
+

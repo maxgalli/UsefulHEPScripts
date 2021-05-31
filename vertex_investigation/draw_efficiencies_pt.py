@@ -1,5 +1,4 @@
 import uproot
-import coffea.hist as hist
 import matplotlib.pyplot as plt
 import numpy as np
 import mplhep as hep
@@ -9,6 +8,7 @@ from utils import parse_arguments
 from utils import file_names_tmpl
 from utils import tree_name_tmpl
 from utils import setup_logging
+from utils import rel_diff_asymm
 from utils.plotting_specs import y_lims
 
 hep.set_style("CMS")
@@ -35,16 +35,12 @@ def count_fraction(awk_arr, var, limits):
         frac = passed / total
         vals.append(frac)
         unc = [
-                abs(ROOT.TEfficiency.ClopperPearson(total, passed, .99, 0) - frac),
-                abs(ROOT.TEfficiency.ClopperPearson(total, passed, .99, 1) - frac)
+                abs(ROOT.TEfficiency.ClopperPearson(total, passed, .68, 0) - frac),
+                abs(ROOT.TEfficiency.ClopperPearson(total, passed, .68, 1) - frac)
                 ]
         uncs.append(unc)
 
     return vals, uncs
-
-
-def rel_diff(a, b):
-    return abs(a - b) / max(a, b)
 
 
 def main(args):
@@ -79,7 +75,7 @@ def main(args):
 
         # Compute quantities
         n_ranges = 35
-        var_range = np.linspace(*specs["range"], n_ranges)
+        var_range = np.linspace(specs["range"][0], specs["range"][1], n_ranges)
 
         var_ranges = []
         inf = var_range[0]
@@ -107,20 +103,16 @@ def main(args):
         ax.errorbar(x_vtx0["values"], y_vtx0["values"], xerr=x_vtx0["unc"], yerr=np.array(y_vtx0["unc"]).T, fmt='ro', label="Vertex 0th")
         ax.errorbar(x_vtxc["values"], y_vtxc["values"], xerr=x_vtxc["unc"], yerr=np.array(y_vtxc["unc"]).T, fmt='bs', label="Vertex Reco")
 
-        rdiff = [rel_diff(v0, vc) for v0, vc in zip(y_vtx0["values"], y_vtxc["values"])]
-        rdiff_err_low = []
-        rdiff_err_up = []
-        for rd, y0, yc, y0_unc, yc_unc in zip(rdiff, y_vtx0["values"], y_vtxc["values"], [unc[0] for unc in y_vtx0["unc"]], [unc[0] for unc in y_vtxc["unc"]]):
-            rdiff_unc = rd * np.sqrt((y0_unc/y0)**2 + (yc_unc/yc)**2)
-            rdiff_err_low.append(rdiff_unc)
-        for rd, y0, yc, y0_unc, yc_unc in zip(rdiff, y_vtx0["values"], y_vtxc["values"], [unc[1] for unc in y_vtx0["unc"]], [unc[1] for unc in y_vtxc["unc"]]):
-            rdiff_unc = rd * np.sqrt((y0_unc/y0)**2 + (yc_unc/yc)**2)
-            rdiff_err_up.append(rdiff_unc)
+        rdiff = [
+            rel_diff_asymm(v0, vc, v0_uncs, vc_uncs) for v0, vc, v0_uncs, vc_uncs in zip(
+                y_vtx0["values"], y_vtxc["values"], y_vtx0["unc"], y_vtxc["unc"]
+                )
+                ]
 
         rax.errorbar(
                 x_vtx0["values"], 
-                rdiff,
-                yerr = np.array(list(zip(rdiff_err_low, rdiff_err_up))).T,
+                y=[rd[0] for rd in rdiff],
+                yerr = np.array([rd[1] for rd in rdiff]).T,
                 fmt='ko'
             )
         ax.legend(fontsize=18, loc="lower right")
@@ -134,7 +126,7 @@ def main(args):
 
         output_name = "{}_id_efficiency".format(var)
         hep.cms.label(loc=0, data=True, llabel="Work in Progress", rlabel="", ax=ax, pad=.05)
-        fig.savefig("{}/{}.jpg".format(output_dir, output_name), bbox_inches='tight')
+        fig.savefig("{}/{}.png".format(output_dir, output_name), bbox_inches='tight')
         fig.savefig("{}/{}.pdf".format(output_dir, output_name), bbox_inches='tight')
 
         logger.info("Dumped plot in {}".format(output_dir))
