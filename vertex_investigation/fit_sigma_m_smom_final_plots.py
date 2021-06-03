@@ -87,6 +87,9 @@ def main(args):
     ax.set_ylim(0.)
     rax.set_ylim(-0.01, 0.2)
     ax.legend(loc="upper left")
+    ax.grid(which="both")
+    rax.grid(which="both")
+
     hep.cms.label(loc=0, data=True, llabel="Work in Progress", rlabel="", ax=ax, pad=.05)
     fig.savefig("{}/all_categories.png".format(output_dir), bbox_inches='tight')
     fig.savefig("{}/all_categories.pdf".format(output_dir), bbox_inches='tight')

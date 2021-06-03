@@ -123,6 +123,8 @@ def main(args):
         rax.set_ylim(*y_lims[var][channel]["rax"])
         ax.set_xlim(left=0.)
         rax.set_xlim(left=0.)
+        ax.grid(which="both")
+        rax.grid(which="both")
 
         output_name = "{}_id_efficiency".format(var)
         hep.cms.label(loc=0, data=True, llabel="Work in Progress", rlabel="", ax=ax, pad=.05)

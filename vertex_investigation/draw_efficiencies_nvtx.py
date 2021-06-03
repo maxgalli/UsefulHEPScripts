@@ -127,6 +127,8 @@ def main(args):
 
         output_name = "{}_id_efficiency".format(var)
         hep.cms.label(loc=0, data=True, llabel="Work in Progress", rlabel="", ax=ax, pad=.05)
+        ax.grid(which="both")
+        rax.grid(which="both")
         fig.savefig("{}/{}.png".format(output_dir, output_name), bbox_inches='tight')
         fig.savefig("{}/{}.pdf".format(output_dir, output_name), bbox_inches='tight')
 
