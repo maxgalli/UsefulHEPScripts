@@ -60,17 +60,8 @@ def main(args):
     vcustom_input_dir = args.vcustom_input_dir
     output_dir = args.output_dir
     channel = args.channel
-    # Fit to sum of CB and gauss or simple gauss
-    shape = args.shape
 
-    if shape == "combo":
-        logger.info("Fit to combination of Gaussian and Double Crystal Ball")
-    elif shape == "gaussian":
-        logger.info("Fit to Gaussian")
-    elif shape == "crystal_ball":
-        logger.info("Fit to Crystal Ball")
-    else:
-        raise ValueError("Something went wrong")
+    logger.info("Fit to Double Crystal Ball")
 
     tree_name = tree_name_tmpl.format(channel)
 
@@ -148,25 +139,23 @@ def main(args):
             # RooFit objects
             mass = ROOT.RooRealVar("mass", "Invariant mass [GeV]", 125, 115, 135)
             weight = ROOT.RooRealVar("weight", "weight", -1, 1)
+            
             mu = ROOT.RooRealVar("mu", "mu", 125, 120, 130)
-            sigma = ROOT.RooRealVar("sigma", "sigma", 1, 0.1, 10)
+            sigma1 = ROOT.RooRealVar("sigma1", "sigma1", 1, 0.1, 10)
+            alpha1 = ROOT.RooRealVar("alpha1", "alpha1", 1, 0, 10)
+            n1 = ROOT.RooRealVar("n1", "n1", 1, 0, 5)
 
-            gauss = ROOT.RooGaussian("gauss", "gauss", mass, mu, sigma)
+            cb1 = ROOT.RooCBShape("cb1", "cb1", mass, mu, sigma1, alpha1, n1)
 
-            mu_cb = ROOT.RooRealVar("mu_cb", "mu_cb", 125, 120, 130)
-            sigma_cb = ROOT.RooRealVar("sigma_cb", "sigma_cb", 4, 0.1, 10)
-            alpha = ROOT.RooRealVar("alpha", "alpha", 1, 0, 10)
-            n = ROOT.RooRealVar("n", "n", 1, 0, 5)
+            sigma2 = ROOT.RooRealVar("sigma2", "sigma2", 4, 0.1, 10)
+            alpha2 = ROOT.RooRealVar("alpha2", "alpha2", 1, 0, 10)
+            n2 = ROOT.RooRealVar("n2", "n2", 1, 0, 5)
+
             frac = ROOT.RooRealVar("frac", "frac", 0.5, 0., 1.)
 
-            cb = ROOT.RooCBShape("cb", "cb", mass, mu_cb, sigma_cb, alpha, n)
+            cb2 = ROOT.RooCBShape("cb2", "cb2", mass, mu, sigma2, alpha2, n2)
 
-            if shape == "gaussian":
-                model = gauss
-            elif shape == "crystal_ball":
-                model = cb
-            else:
-                model = ROOT.RooAddPdf("model", "model", ROOT.RooArgList(gauss, cb), ROOT.RooArgList(frac))
+            model = ROOT.RooAddPdf("model", "model", ROOT.RooArgList(cb1, cb2), ROOT.RooArgList(frac))
 
             # Create (weighted) dataset
             data = ROOT.RooDataSet("data".format(cat_name), "data".format(cat_name), cut_tree, ROOT.RooArgSet(mass, weight), "", weight.GetName())
@@ -199,46 +188,35 @@ def main(args):
             # Fill values for final plots
             parameters = {var.GetName(): var.getVal() for var in list(model.getParameters(data))}
 
-            if shape == "combo":
-                # See https://root-forum.cern.ch/t/how-to-calculate-effective-sigma/39472/3
-                final_plots_specs[vtx_name][cat_name]["fitted_sigma"] = np.sqrt(
-                        (parameters["sigma"]**2)*parameters["frac"] \
-                        + (parameters["sigma_cb"]**2)*(1 - parameters["frac"])
-                        )
-                # Propagate uncertainty on sigma effective
-                # To get the covariances from fit result, remember the indexes
-                cov_matrix = fit_result.covarianceMatrix()
-                frac_index = 1
-                sigma_gauss_index = 5
-                sigma_cb_index = 6
+            # See https://root-forum.cern.ch/t/how-to-calculate-effective-sigma/39472/3
+            final_plots_specs[vtx_name][cat_name]["fitted_sigma"] = np.sqrt(
+                    (parameters["sigma1"]**2)*parameters["frac"] \
+                    + (parameters["sigma2"]**2)*(1 - parameters["frac"])
+                    )
+            # Propagate uncertainty on sigma effective
+            # To get the covariances from fit result, remember the indexes
+            cov_matrix = fit_result.covarianceMatrix()
+            frac_index = 2
+            sigma1_index = 6
+            sigma2_index = 7
 
-                var_frac = cov_matrix[frac_index][frac_index]
-                var_v_gauss = cov_matrix[sigma_gauss_index][sigma_gauss_index]
-                var_cb_index = cov_matrix[sigma_cb_index][sigma_cb_index]
+            var_frac = cov_matrix[frac_index][frac_index]
+            var_v_1 = cov_matrix[sigma1_index][sigma1_index]
+            var_v_2 = cov_matrix[sigma2_index][sigma2_index]
 
-                cov_v_gauss_v_cb = cov_matrix[sigma_gauss_index][sigma_cb_index]
-                cov_v_gauss_frac = cov_matrix[sigma_gauss_index][frac_index]
-                cov_v_cb_frac = cov_matrix[sigma_cb_index][frac_index]
+            cov_v_1_v_2 = cov_matrix[sigma1_index][sigma2_index]
+            cov_v_1_frac = cov_matrix[sigma1_index][frac_index]
+            cov_v_2_frac = cov_matrix[sigma2_index][frac_index]
 
 
-                final_plots_specs[vtx_name][cat_name]["fitted_sigma_unc"] = eff_sigma_unc(
-                        parameters["frac"], 
-                        1 - parameters["frac"], 
-                        parameters["sigma"] - parameters["sigma_cb"],
-                        var_v_gauss, var_cb_index, var_frac,
-                        cov_v_gauss_v_cb, cov_v_gauss_frac, cov_v_cb_frac
-                        )
+            final_plots_specs[vtx_name][cat_name]["fitted_sigma_unc"] = eff_sigma_unc(
+                    parameters["frac"], 
+                    1 - parameters["frac"], 
+                    parameters["sigma1"] - parameters["sigma2"],
+                    var_v_1, var_v_2, var_frac,
+                    cov_v_1_v_2, cov_v_1_frac, cov_v_2_frac
+                    )
 
-            else:
-                if shape == "gaussian":
-                    final_plots_specs[vtx_name][cat_name]["fitted_sigma"] = parameters["sigma"]
-                else:
-                    final_plots_specs[vtx_name][cat_name]["fitted_sigma"] = parameters["sigma_cb"]
-                cov_matrix = fit_result.covarianceMatrix()
-                sigma_index = 1
-                var_sigma = cov_matrix[sigma_index][sigma_index]
-                final_plots_specs[vtx_name][cat_name]["fitted_sigma_unc"] = np.sqrt(var_sigma)
-            
     logger.info("Dumping final plots specifications: {}".format(final_plots_specs))
 
     with open("sigma_m_final_plots_specs_{}.pkl".format(channel), "wb") as fl:

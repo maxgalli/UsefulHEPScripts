@@ -49,13 +49,6 @@ def parse_arguments():
             required=True
             )
 
-    parser.add_argument(
-           "--shape",
-           type=str,
-           default="combo",
-           choices=("combo", "gaussian", "crystal_ball")
-           )
-
     return parser.parse_args()
 
 
