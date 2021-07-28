@@ -1,3 +1,19 @@
+"""
+Given a JSON file containing data like the following:
+{
+    "dataset_name": [
+        "path_to_remote_file1",
+        "path_to_remote_file_2"
+    ]
+}
+which is usually dumped by dasgoclient or the script here https://github.com/maxgalli/hgg-coffea/blob/master/filefetcher/fetch.py
+loop over the files to copy them locally using xrootd.
+
+The argument --output determines where the files will be stored.
+Inside, one subdirectory for each "dataset_name" is created and the relative files stored in there.
+"""
+
+
 import argparse
 import os
 import json
