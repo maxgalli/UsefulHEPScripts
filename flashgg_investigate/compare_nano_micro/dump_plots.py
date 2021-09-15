@@ -56,12 +56,16 @@ def main(args):
         microaod_arr["lead_ch_iso_worst_uncorr"] = microaod_arr["lead_ch_iso_worst__uncorr"]
 
     if args.sd == "EB":
-        nanoaod_arr = nanoaod_arr[np.abs(nanoaod_arr.eta) < 1.5]
-        microaod_arr = microaod_arr[np.abs(microaod_arr.eta) < 1.5]
+        nanoaod_arr = nanoaod_arr[np.abs(nanoaod_arr.lead_eta) < 1.5]
+        nanoaod_arr = nanoaod_arr[np.abs(nanoaod_arr.sublead_eta) < 1.5]
+        microaod_arr = microaod_arr[np.abs(microaod_arr.lead_eta) < 1.5]
+        microaod_arr = microaod_arr[np.abs(microaod_arr.sublead_eta) < 1.5]
 
     if args.sd == "EE":
-        nanoaod_arr = nanoaod_arr[np.abs(nanoaod_arr.eta) > 1.5]
-        microaod_arr = microaod_arr[np.abs(microaod_arr.eta) > 1.5]
+        nanoaod_arr = nanoaod_arr[np.abs(nanoaod_arr.lead_eta) > 1.5]
+        nanoaod_arr = nanoaod_arr[np.abs(nanoaod_arr.sublead_eta) > 1.5]
+        microaod_arr = microaod_arr[np.abs(microaod_arr.lead_eta) > 1.5]
+        microaod_arr = microaod_arr[np.abs(microaod_arr.sublead_eta) > 1.5]
 
     # Read catalogue of variables to be plotted
     with open("plots_specs.json", "r") as f:
@@ -102,7 +106,7 @@ def main(args):
     # Cut over delta R
     # Here https://github.com/CoffeaTeam/coffea/blob/3db3fab23064c70d0ca63b185d51c7fa3b7849dc/coffea/nanoevents/methods/vector.py#L74
     # useful info
-    deltaR_threshold = 0.0001
+    deltaR_threshold = 0.1
 
     four_lead_nano = vector.obj(
         pt=pd_joined["lead_pt"],
@@ -134,8 +138,10 @@ def main(args):
         E=pd_joined["sublead_SCRawE"]
     )
 
-    pd_joined["deltaR_micro"] = four_lead_micro.deltaR(four_sublead_micro)
-    pd_joined = pd_joined[abs(pd_joined["deltaR_nano"] - pd_joined["deltaR_micro"]) < deltaR_threshold]
+    pd_joined["lead_deltaR"] = four_lead_nano.deltaR(four_lead_micro)
+    pd_joined["sublead_deltaR"] = four_sublead_nano.deltaR(four_sublead_micro)
+    pd_joined = pd_joined[pd_joined["lead_deltaR"] < deltaR_threshold]
+    pd_joined = pd_joined[pd_joined["sublead_deltaR"] < deltaR_threshold]
     print("Final joined dataframe:\n{}".format(pd_joined))
 
     # Plot
@@ -183,7 +189,7 @@ def main(args):
         plt.close(fig)
 
     # Dump pandas dataframe to parquet file
-    pd_joined.to_parquet("nano_micro_{}.paqruet".format(args.sd), engine="fastparquet")
+    pd_joined.to_parquet("nano_micro_{}.parquet".format(args.sd), engine="fastparquet")
     print("Dumped dataframe to parquet file")
 
 
