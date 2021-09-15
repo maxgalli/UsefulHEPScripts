@@ -1,5 +1,7 @@
 # Nano - Micro Comparison
 
+Details regarding the production of NanoAODs and MicroAODs are reported [here](https://gist.github.com/maxgalli/0886ec4290672ecf57031ac969c4ade5).
+
 ## XGBoost - TMVA
 
 ```compare_xgb_tmva.py``` is meant to compare the shapes coming from the same models using XGBoost and plain TMVA.
