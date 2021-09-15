@@ -11,7 +11,7 @@ suffixes _nano and _micro are appended).
 
 The quantity compared using XGBoost and TMVA is the PhotonIDMVA of the leading photon (barrel). For UL2017-EB, flashgg has a model trained and applied in TMVA
 which can be found [here](https://github.com/cms-analysis/flashgg/blob/dev_legacy_runII/MetaData/data/MetaConditions/Era2017_legacy_v1.json#L37).
-To be applied inside [this branch](https://github.com/maxgalli/hgg-coffea/tree/photonIDMVA) of hgg-coffea, [this tool](https://github.com/guitargeek/tmva-to-xgboost) was used to convert it to JSON (note the transform applied in [this line](https://github.com/guitargeek/tmva-to-xgboost)).
+To be applied inside [this branch](https://github.com/maxgalli/hgg-coffea/tree/photonIDMVA) of hgg-coffea, [this tool](https://github.com/guitargeek/tmva-to-xgboost) was used to convert it to JSON (note the transform applied in [this line](https://github.com/maxgalli/hgg-coffea/blob/photonIDMVA/src/hgg_coffea/tools/photonid_mva.py#L53)).
 
 The pure TMVA (original) version is applied inside the ```compare_xgb_tmva.py``` script itself.
 
