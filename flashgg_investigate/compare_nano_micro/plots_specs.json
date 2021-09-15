@@ -1,0 +1,392 @@
+[
+    {
+        "nano_col": "lead_energyRaw",
+        "micro_col": "lead_SCRawE",
+        "bins": 100,
+        "range": [
+            0,
+            300
+        ],
+        "var": "$E_{\\gamma, 1}$"
+    },
+    {
+        "nano_col": "sublead_energyRaw",
+        "micro_col": "sublead_SCRawE",
+        "bins": 100,
+        "range": [
+            0,
+            300
+        ],
+        "var": "$E_{\\gamma, 2}$"
+    },
+    {
+        "nano_col": "lead_r9",
+        "micro_col": "lead_r9",
+        "bins": 100,
+        "range": [
+            0.4,
+            1.1
+        ],
+        "var": "$R_{9, 1}$"
+    },
+    {
+        "nano_col": "sublead_r9",
+        "micro_col": "sublead_r9",
+        "bins": 100,
+        "range": [
+            0.4,
+            1.1
+        ],
+        "var": "$R_{9, 2}$"
+    },
+    {
+        "nano_col": "lead_uncorr_r9",
+        "micro_col": "lead_r9_uncorr",
+        "bins": 100,
+        "range": [
+            0.4,
+            1.1
+        ],
+        "var": "$R_{9-uncorrected, 1}$"
+    },
+    {
+        "nano_col": "lead_sieie",
+        "micro_col": "lead_sieie",
+        "bins": 100,
+        "range": [
+            0,
+            0.02
+        ],
+        "var": "$\\sigma_{ieie, 1}$"
+    },
+    {
+        "nano_col": "sublead_sieie",
+        "micro_col": "sublead_sieie",
+        "bins": 100,
+        "range": [
+            0,
+            0.02
+        ],
+        "var": "$\\sigma_{ieie, 2}$"
+    },
+    {
+        "nano_col": "lead_uncorr_sieie",
+        "micro_col": "lead_sieie_uncorr",
+        "bins": 100,
+        "range": [
+            0,
+            0.02
+        ],
+        "var": "$\\sigma_{ieie-uncorrected, 1}$"
+    },
+    {
+        "nano_col": "lead_etaWidth",
+        "micro_col": "lead_eta_width",
+        "bins": 100,
+        "range": [
+            0,
+            0.03
+        ],
+        "var": "$\\eta_{width, 1}$"
+    },
+    {
+        "nano_col": "sublead_etaWidth",
+        "micro_col": "sublead_eta_width",
+        "bins": 100,
+        "range": [
+            0,
+            0.03
+        ],
+        "var": "$\\eta_{width, 2}$"
+    },
+    {
+        "nano_col": "lead_uncorr_etaWidth",
+        "micro_col": "lead_eta_width_uncorr",
+        "bins": 100,
+        "range": [
+            0,
+            0.03
+        ],
+        "var": "$\\eta_{width-uncorrected, 1}$"
+    },
+    {
+        "nano_col": "lead_phiWidth",
+        "micro_col": "lead_phi_width",
+        "bins": 100,
+        "range": [
+            0,
+            0.1
+        ],
+        "var": "$\\phi_{width, 1}$"
+    },
+    {
+        "nano_col": "sublead_phiWidth",
+        "micro_col": "sublead_phi_width",
+        "bins": 100,
+        "range": [
+            0,
+            0.1
+        ],
+        "var": "$\\phi_{width, 2}$"
+    },
+    {
+        "nano_col": "lead_uncorr_phiWidth",
+        "micro_col": "lead_phi_width_uncorr",
+        "bins": 100,
+        "range": [
+            0,
+            0.1
+        ],
+        "var": "$\\phi_{width-uncorrected, 1}$"
+    },
+    {
+        "nano_col": "lead_sieip",
+        "micro_col": "lead_sieip",
+        "bins": 100,
+        "range": [
+            -0.0004,
+            0.0004
+        ],
+        "var": "$\\sigma_{ieip, 1}$"
+    },
+    {
+        "nano_col": "sublead_sieip",
+        "micro_col": "sublead_sieip",
+        "bins": 100,
+        "range": [
+            -0.0004,
+            0.0004
+        ],
+        "var": "$\\sigma_{ieip, 2}$"
+    },
+    {
+        "nano_col": "lead_uncorr_sieip",
+        "micro_col": "lead_sieip_uncorr",
+        "bins": 100,
+        "range": [
+            -0.0004,
+            0.0004
+        ],
+        "var": "$\\sigma_{ieip-uncorrected, 1}$"
+    },
+    {
+        "nano_col": "lead_s4",
+        "micro_col": "lead_s4",
+        "bins": 100,
+        "range": [
+            0.4,
+            1
+        ],
+        "var": "$S4_1$"
+    },
+    {
+        "nano_col": "sublead_s4",
+        "micro_col": "sublead_s4",
+        "bins": 100,
+        "range": [
+            0.4,
+            1
+        ],
+        "var": "$S4_2$"
+    },
+    {
+        "nano_col": "lead_pfPhoIso03",
+        "micro_col": "lead_pho_iso",
+        "bins": 100,
+        "range": [
+            0,
+            1
+        ],
+        "var": "$PhotonIso_{1}$"
+    },
+    {
+        "nano_col": "sublead_pfPhoIso03",
+        "micro_col": "sublead_pho_iso",
+        "bins": 100,
+        "range": [
+            0,
+            1
+        ],
+        "var": "$PhotonIso_{2}$"
+    },
+    {
+        "nano_col": "lead_uncorr_pfPhoIso03",
+        "micro_col": "lead_pho_iso_uncorr",
+        "bins": 100,
+        "range": [
+            0,
+            1
+        ],
+        "var": "$PhotonIso_{uncorrected, 1}$"
+    },
+    {
+        "nano_col": "lead_pfChargedIsoPFPV",
+        "micro_col": "lead_ch_iso",
+        "bins": 100,
+        "range": [
+            0,
+            5
+        ],
+        "var": "$ChargedIso_{1}$"
+    },
+    {
+        "nano_col": "sublead_pfChargedIsoPFPV",
+        "micro_col": "sublead_ch_iso",
+        "bins": 100,
+        "range": [
+            0,
+            5
+        ],
+        "var": "$ChargedIso_{2}$"
+    },
+    {
+        "nano_col": "lead_uncorr_pfChargedIsoPFPV",
+        "micro_col": "lead_ch_iso_uncorr",
+        "bins": 100,
+        "range": [
+            0,
+            5
+        ],
+        "var": "$ChargedIso_{uncorrected, 1}$"
+    },
+    {
+        "nano_col": "lead_pfChargedIsoWorstVtx",
+        "micro_col": "lead_ch_iso_worst",
+        "bins": 100,
+        "range": [
+            0,
+            10
+        ],
+        "var": "$ChargedIsoWorst_{1}$"
+    },
+    {
+        "nano_col": "sublead_pfChargedIsoWorstVtx",
+        "micro_col": "sublead_ch_iso_worst",
+        "bins": 100,
+        "range": [
+            0,
+            10
+        ],
+        "var": "$ChargedIsoWorst_{2}$"
+    },
+    {
+        "nano_col": "lead_uncorr_pfChargedIsoWorstVtx",
+        "micro_col": "lead_ch_iso_worst_uncorr",
+        "bins": 100,
+        "range": [
+            0,
+            10
+        ],
+        "var": "$ChargedIsoWorst_{uncorrected, 1}$"
+    },
+    {
+        "nano_col": "lead_eta",
+        "micro_col": "lead_eta",
+        "bins": 100,
+        "range": [
+            -3,
+            3
+        ],
+        "var": "lead $\\eta$"
+    },
+    {
+        "nano_col": "sublead_eta",
+        "micro_col": "sublead_eta",
+        "bins": 100,
+        "range": [
+            -3,
+            3
+        ],
+        "var": "sublead $\\eta$"
+    },
+    {
+        "nano_col": "mass",
+        "micro_col": "mass",
+        "bins": 100,
+        "range": [
+            100,
+            140
+        ],
+        "var": "$m_{H}$"
+    },
+    {
+        "nano_col": "lead_mvaID_recomputed",
+        "micro_col": "lead_mva",
+        "bins": 100,
+        "range": [
+            0,
+            1
+        ],
+        "var": "lead PhoIdMVA (reco)"
+    },
+    {
+        "nano_col": "sublead_mvaID_recomputed",
+        "micro_col": "sublead_mva",
+        "bins": 100,
+        "range": [
+            0,
+            1
+        ],
+        "var": "sublead PhoIdMVA (reco)"
+    },
+    {
+        "nano_col": "lead_mvaID",
+        "micro_col": "lead_mva_uncorr",
+        "bins": 100,
+        "range": [
+            0,
+            1
+        ],
+        "var": "lead PhoIdMVA (uncorrected, non recomputed)"
+    },
+    {
+        "nano_col": "lead_pt",
+        "micro_col": "leadPt",
+        "bins": 100,
+        "range": [
+            0,
+            200
+        ],
+        "var": "lead $p_{t}$"
+    },
+    {
+        "nano_col": "sublead_pt",
+        "micro_col": "subleadPt",
+        "bins": 100,
+        "range": [
+            0,
+            200
+        ],
+        "var": "sublead $p_{t}$"
+    },
+    {
+        "nano_col": "eta",
+        "micro_col": "eta",
+        "bins": 100,
+        "range": [
+            -3,
+            3
+        ],
+        "var": "$\\eta$"
+    },
+    {
+        "nano_col": "lead_phi",
+        "micro_col": "lead_phi",
+        "bins": 100,
+        "range": [
+            -3,
+            3
+        ],
+        "var": "lead $\\phi$"
+    },
+    {
+        "nano_col": "sublead_phi",
+        "micro_col": "sublead_phi",
+        "bins": 100,
+        "range": [
+            -3,
+            3
+        ],
+        "var": "sublead $\\phi$"
+    }
+]

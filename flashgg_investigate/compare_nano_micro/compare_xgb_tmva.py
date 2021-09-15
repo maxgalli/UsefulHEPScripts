@@ -130,7 +130,7 @@ def main(args):
 
     down.hist(100 * (df["lead_mvaID_recomputed"] - lead_idmva_tmva) / lead_idmva_tmva, 
               bins=500,
-              range=(-10, 10),
+              range=(-100, 100),
               histtype="step",
               density=True,
               linewidth=2
