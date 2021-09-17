@@ -16,6 +16,7 @@ from array import array
 import numpy as np
 import matplotlib.pyplot as plt
 import mplhep as hep
+import xgboost
 hep.style.use("CMS")
 
 def parse_arguments():
@@ -29,6 +30,11 @@ def parse_arguments():
 
     parser.add_argument(
         "--tmva-model",
+        required=True
+    )
+
+    parser.add_argument(
+        "--xgboost-model",
         required=True
     )
 
@@ -70,6 +76,17 @@ def main(args):
             name += "_nano"
         arr_dict[name_orig] = df[name]
     ak_arr = ak.Array(arr_dict)
+    print(ak_arr.type)
+
+    # Explicitely recompute also XGBoost one, just because
+    print("Recomputing MVA with XGBoost")
+    mva = xgboost.Booster()
+    mva.load_model(args.xgboost_model)
+    var_order = list(arr_dict.keys())
+    bdt_inputs = np.column_stack([ak.to_numpy(ak_arr[name]) for name in var_order])
+    tempmatrix = xgboost.DMatrix(bdt_inputs, feature_names=var_order)
+    lead_idmva_xgboost = mva.predict(tempmatrix)
+    lead_idmva_xgboost = 1. / (1. + np.exp(-1. * (lead_idmva_xgboost + 1.)))
 
     # Dump nanoaod inputs to a TTree
     with uproot3.recreate(processed_nano) as f:
@@ -97,7 +114,7 @@ def main(args):
     for branch in events.GetListOfBranches():
         name = branch.GetName()
         tmva_name = inputs[name]
-        branches[tmva_name] = array("f", [-999])
+        branches[tmva_name] = array("f", [0])
         reader.AddVariable(tmva_name, branches[tmva_name])
         events.SetBranchAddress(name, branches[tmva_name])
 
@@ -113,7 +130,7 @@ def main(args):
 
     # Plot
     print("Plotting to {}".format(args.output_dir))
-    bins = 200
+    bins = 100
     rng = (-1, 1)
 
     fig, (up, down) = plt.subplots(
@@ -122,13 +139,13 @@ def main(args):
         gridspec_kw={"height_ratios": (1, 1)}
         )
 
-    up.hist(df["lead_mvaID_recomputed"], bins=bins, range=rng, histtype="step", label="XGBoost", linewidth=2)
+    up.hist(lead_idmva_xgboost, bins=bins, range=rng, histtype="step", label="XGBoost", linewidth=2)
     up.hist(lead_idmva_tmva, bins=bins, range=rng, histtype="step", label="TMVA", linewidth=2)
 
     up.set_xlabel("lead PhoIDMVA after corrections")
     up.legend(fontsize=18, loc="upper left")
 
-    down.hist(100 * (df["lead_mvaID_recomputed"] - lead_idmva_tmva) / lead_idmva_tmva, 
+    down.hist(100 * (lead_idmva_xgboost - lead_idmva_tmva) / lead_idmva_tmva, 
               bins=500,
               range=(-100, 100),
               histtype="step",
