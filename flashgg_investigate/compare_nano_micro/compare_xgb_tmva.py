@@ -86,47 +86,33 @@ def main(args):
     bdt_inputs = np.column_stack([ak.to_numpy(ak_arr[name]) for name in var_order])
     tempmatrix = xgboost.DMatrix(bdt_inputs, feature_names=var_order)
     lead_idmva_xgboost = mva.predict(tempmatrix)
-    lead_idmva_xgboost = 1. / (1. + np.exp(-1. * (lead_idmva_xgboost + 1.)))
+    #lead_idmva_xgboost = 1. / (1. + np.exp(-1. * (lead_idmva_xgboost + 1.)))
+    lead_idmva_xgboost = 2. / (1. + np.exp(-2 * (lead_idmva_xgboost + 1.0))) - 1.
 
     # Dump nanoaod inputs to a TTree
     with uproot3.recreate(processed_nano) as f:
         branchdict = {}
         arraydict = {}
     
-        for name in inputs.keys():
-            branchdict[name] = str(ak_arr[name].type.type).replace('?', '')
-            arraydict[name] = ak_arr[name]
+        for nano_name, model_name in inputs.items():
+            #branchdict[model_name] = str(ak_arr[nano_name].type.type).replace('?', '')
+            branchdict[model_name] = "float32"
+            arraydict[model_name] = ak_arr[nano_name]
     
         f["Events"] = uproot3.newtree(branchdict)
         f["Events"].extend(arraydict)
 
-    # Setup TMVA
-    ROOT.TMVA.Tools.Instance()
-    ROOT.TMVA.PyMethodBase.PyInitialize()
-    reader = ROOT.TMVA.Reader("Color:!Silent")
+    # TMVA with RDataFrame
+    ROOT.gInterpreter.ProcessLine('''
+    TMVA::Experimental::RReader model("{}");
+    computeModel = TMVA::Experimental::Compute<{}, float>(model);
+    '''.format(args.tmva_model, len(ak_arr.fields)))
 
-    # Load data
-    data = ROOT.TFile(processed_nano)
-    events = data.Get("Events")
-
-    # Build reader in TMVA
-    branches = {}
-    for branch in events.GetListOfBranches():
-        name = branch.GetName()
-        tmva_name = inputs[name]
-        branches[tmva_name] = array("f", [0])
-        reader.AddVariable(tmva_name, branches[tmva_name])
-        events.SetBranchAddress(name, branches[tmva_name])
-
-    reader.BookMVA("BDT", ROOT.TString(args.tmva_model))
-
-    # Prediction
-    lst = []
-    print("Starting event loop")
-    for i in range(len(ak_arr)): # not exactly fast
-        events.GetEntry(i)
-        lst.append(reader.EvaluateMVA("BDT"))
-    lead_idmva_tmva = np.array(lst)
+    rdf = ROOT.RDataFrame("Events", processed_nano)
+    rdf = rdf.Define("lead_idmva_tmva", ROOT.computeModel, ROOT.model.GetVariableNames())
+    print("Running RDF event loop")
+    dct = rdf.AsNumpy(columns=["lead_idmva_tmva"])
+    lead_idmva_tmva = np.array([v[0] for v in dct["lead_idmva_tmva"]])
 
     # Plot
     print("Plotting to {}".format(args.output_dir))
@@ -150,6 +136,7 @@ def main(args):
               range=(-100, 100),
               histtype="step",
               density=True,
+              color="black",
               linewidth=2
              )
     down.set_xlabel("$(XGB - TMVA)/TMVA$ [%]")
@@ -157,10 +144,17 @@ def main(args):
 
     fig.tight_layout()
 
-    fig.savefig("{}/lead_nano_cfr_tmva.png".format(args.output_dir), bbox_inches='tight')
-    fig.savefig("{}/lead_nano_cfr_tmva.pdf".format(args.output_dir), bbox_inches='tight')
+    fig.savefig("{}/lead_xgb_tmva.png".format(args.output_dir), bbox_inches='tight')
+    fig.savefig("{}/lead_xgb_tmva.pdf".format(args.output_dir), bbox_inches='tight')
 
-    
+    fig, ax = plt.subplots()
+    ax.scatter(lead_idmva_xgboost, lead_idmva_tmva)
+    ax.set_xlabel("XGBoost")
+    ax.set_ylabel("TMVA")
+
+    fig.savefig("{}/xgb_tmva_scatter.png".format(args.output_dir), bbox_inches='tight')
+    fig.savefig("{}/xgb_tmva_scatter.pdf".format(args.output_dir), bbox_inches='tight')
+   
 
 if __name__ == "__main__":
     args = parse_arguments()
