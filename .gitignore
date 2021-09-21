@@ -76,3 +76,10 @@ dask-worker-space
 
 # VisualStudioCode
 *.code-workspace
+
+# Plots
+*.png
+*.pdf
+
+# Other
+*.nfs*

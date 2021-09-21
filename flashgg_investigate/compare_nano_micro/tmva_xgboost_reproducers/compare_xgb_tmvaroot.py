@@ -11,7 +11,7 @@ hep.style.use("CMS")
 def main():
 
     processed_nano = "lead_processed_nano.root"
-    xml_model = "bdt.xml"
+    root_model = "bdt.root"
     xgb_model = "bdt.json"
 
     f = uproot.open(processed_nano)
@@ -30,16 +30,10 @@ def main():
     #lead_idmva_xgboost = 2. / (1. + np.exp(-2. * (lead_idmva_xgboost + 1.))) - 1.
 
     # TMVA with RDataFrame
-    ROOT.gInterpreter.ProcessLine('''
-    TMVA::Experimental::RReader model("{}");
-    computeModel = TMVA::Experimental::Compute<{}, float>(model);
-    '''.format(xml_model, len(events.fields)))
-
-    rdf = ROOT.RDataFrame("Events", processed_nano)
-    rdf = rdf.Define("lead_idmva_tmva", ROOT.computeModel, ROOT.model.GetVariableNames())
-    print("Running RDF event loop")
-    dct = rdf.AsNumpy(columns=["lead_idmva_tmva"])
-    lead_idmva_tmva = np.array([v[0] for v in dct["lead_idmva_tmva"]])
+    print("Predicting using model found in ROOT file")
+    bdt = ROOT.TMVA.Experimental.RBDT[""]("BDT", root_model)
+    x = np.column_stack([events[field].to_numpy() for field in events.fields])
+    lead_idmva_tmva = bdt.Compute(x).squeeze()
 
     # Plot
     bins = 100
@@ -70,16 +64,16 @@ def main():
 
     fig.tight_layout()
 
-    fig.savefig("xgb_vs_tmva.png", bbox_inches='tight')
-    fig.savefig("xgb_vs_tmva.pdf", bbox_inches='tight')
+    fig.savefig("xgb_vs_roottmva.png", bbox_inches='tight')
+    fig.savefig("xgb_vs_roottmva.pdf", bbox_inches='tight')
 
     fig, ax = plt.subplots()
     ax.scatter(lead_idmva_xgboost, lead_idmva_tmva)
     ax.set_xlabel("XGBoost")
     ax.set_ylabel("TMVA")
 
-    fig.savefig("xgb_vs_tmva_scatter.png", bbox_inches='tight')
-    fig.savefig("xgb_vs_tmva_scatter.pdf", bbox_inches='tight')
+    fig.savefig("xgb_vs_roottmva_scatter.png", bbox_inches='tight')
+    fig.savefig("xgb_vs_roottmva_scatter.pdf", bbox_inches='tight')
    
 
 if __name__ == "__main__":
