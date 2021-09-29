@@ -54,8 +54,8 @@
         "micro_col": "lead_sieie",
         "bins": 100,
         "range": [
-            0,
-            0.02
+            0.002,
+            0.015
         ],
         "var": "$\\sigma_{ieie, 1}$"
     },
@@ -64,8 +64,8 @@
         "micro_col": "sublead_sieie",
         "bins": 100,
         "range": [
-            0,
-            0.02
+            0.002,
+            0.015
         ],
         "var": "$\\sigma_{ieie, 2}$"
     },
@@ -74,8 +74,8 @@
         "micro_col": "lead_sieie_uncorr",
         "bins": 100,
         "range": [
-            0,
-            0.02
+            0.002,
+            0.015
         ],
         "var": "$\\sigma_{ieie-uncorrected, 1}$"
     },
@@ -144,8 +144,8 @@
         "micro_col": "lead_sieip",
         "bins": 100,
         "range": [
-            -0.0004,
-            0.0004
+            -0.0002,
+            0.0002
         ],
         "var": "$\\sigma_{ieip, 1}$"
     },
@@ -154,8 +154,8 @@
         "micro_col": "sublead_sieip",
         "bins": 100,
         "range": [
-            -0.0004,
-            0.0004
+            -0.0002,
+            0.0002
         ],
         "var": "$\\sigma_{ieip, 2}$"
     },
@@ -164,8 +164,8 @@
         "micro_col": "lead_sieip_uncorr",
         "bins": 100,
         "range": [
-            -0.0004,
-            0.0004
+            -0.0002,
+            0.0002
         ],
         "var": "$\\sigma_{ieip-uncorrected, 1}$"
     },
@@ -188,6 +188,16 @@
             1
         ],
         "var": "$S4_2$"
+    },
+    {
+        "nano_col": "lead_uncorr_s4",
+        "micro_col": "lead_s4_uncorr",
+        "bins": 100,
+        "range": [
+            0.4,
+            1
+        ],
+        "var": "$S4_1-uncorrected$"
     },
     {
         "nano_col": "lead_pfPhoIso03",
@@ -314,7 +324,7 @@
         "micro_col": "lead_mva",
         "bins": 100,
         "range": [
-            0,
+            -1,
             1
         ],
         "var": "lead PhoIdMVA (reco)"
@@ -324,20 +334,10 @@
         "micro_col": "sublead_mva",
         "bins": 100,
         "range": [
-            0,
+            -1,
             1
         ],
         "var": "sublead PhoIdMVA (reco)"
-    },
-    {
-        "nano_col": "lead_mvaID",
-        "micro_col": "lead_mva_uncorr",
-        "bins": 100,
-        "range": [
-            0,
-            1
-        ],
-        "var": "lead PhoIdMVA (uncorrected, non recomputed)"
     },
     {
         "nano_col": "lead_pt",

@@ -147,10 +147,10 @@ def main(args):
     # Plot
     print("Start plotting")
     for column in columns:
-        fig, (up, down) = plt.subplots(
-            nrows=2,
+        fig, (up, middle, down) = plt.subplots(
+            nrows=3,
             ncols=1,
-            gridspec_kw={"height_ratios": (1, 1)}
+            gridspec_kw={"height_ratios": (2, 1, 1)}
             )
 
         nano_name = column["nano_col"]
@@ -159,21 +159,41 @@ def main(args):
         if nano_name == micro_name:
             nano_name += "_nano"
             micro_name += "_micro"
+        
+        range = column["range"]
 
-        n, n_, n__ = up.hist(pd_joined[nano_name], bins=column["bins"], range=column["range"], histtype="step", label="NanoAOD", linewidth=2)
-        m, m_, m__ = up.hist(pd_joined[micro_name], bins=column["bins"], range=column["range"], histtype="step", label="MicroAOD", linewidth=2)
+        # Up
+        n, n_, n__ = up.hist(pd_joined[nano_name], bins=column["bins"], range=range, histtype="step", label="NanoAOD", linewidth=2)
+        m, m_, m__ = up.hist(pd_joined[micro_name], bins=column["bins"], range=range, histtype="step", label="MicroAOD", linewidth=2)
 
-        up.set_xlabel(column["var"])
         up.legend(fontsize=18, loc="upper right")
+        up.set_xlim(range)
+        up.set_xlabel(column["var"])
+        up.set_ylabel("Events")
 
+        # Middle
+        ylim = [-0.4, 0.4]
+        middle.set_ylim(ylim)
+        middle.axhline(0, xmin=range[0], xmax=range[1], color="black", ls="--", lw=".4")
+        centers = (n_[:-1] + n_[1:]) / 2
+        middle.plot(centers, (n - m) / m, "k.")
+        middle.set_xlim(range)
+        middle.set_xlabel(column["var"])
+        middle.set_ylabel("$(n - \mu)/\mu$ [%]")
+
+        # Down
+        perc_range = (-100, 100)
+        perc_bins = 500
         down.hist(100 * (pd_joined[nano_name] - pd_joined[micro_name]) / pd_joined[micro_name], 
-                  bins=500,
-                  range=(-100, 100),
+                  bins=perc_bins,
+                  range=perc_range,
                   histtype="step",
                   density=True,
+                  color="black",
                   linewidth=2)
-        down.set_xlabel("$(n - \mu)/\mu$ [%]")
         down.set_yscale("log")
+        down.set_xlabel("$(n - \mu)/\mu$ [%]")
+        down.set_ylabel("Events / {}%".format((perc_range[1] - perc_range[0]) / perc_bins))
 
         print(column["nano_col"])
         print("nano: {}".format(np.sum(n)))
@@ -191,6 +211,45 @@ def main(args):
     # Dump pandas dataframe to parquet file
     pd_joined.to_parquet("nano_micro_{}.parquet".format(args.sd), engine="fastparquet")
     print("Dumped dataframe to parquet file")
+
+    # Redundant: dump separate dataframes for nano and micro with PhotonID inputs
+    nano_vars = {
+        "r9": "lead_r9_nano", 
+        "s4": "lead_s4_nano",
+        "sieie": "lead_sieie_nano",
+        "etaWidth": "lead_etaWidth",
+        "phiWidth": "lead_phiWidth",
+        "sieip": "lead_sieip_nano",
+        "pfPhoIso03": "lead_pfPhoIso03",
+        "pfChargedIsoPFPV": "lead_pfChargedIsoPFPV",
+        "pfChargedIsoWorstVtx": "lead_pfChargedIsoWorstVtx",
+
+        "mva_ID": "lead_mvaID_recomputed"
+        }
+
+    micro_vars = {
+        "r9": "lead_r9_micro", 
+        "s4": "lead_s4_micro",
+        "sieie": "lead_sieie_micro",
+        "etaWidth": "lead_eta_width",
+        "phiWidth": "lead_phi_width",
+        "sieip": "lead_sieip_micro",
+        "pfPhoIso03": "lead_pho_iso",
+        "pfChargedIsoPFPV": "lead_ch_iso",
+        "pfChargedIsoWorstVtx": "lead_ch_iso_worst",
+
+        "mva_ID": "lead_mva"
+        }
+
+    nano_df = pd_joined[list(nano_vars.values())]
+    nano_df.rename(columns=dict((v, k) for k, v in nano_vars.items()), inplace=True)
+    nano_df.to_parquet("nano_{}.parquet".format(args.sd), engine="fastparquet")
+    print("Dumped nano dataframe to parquet file")
+
+    micro_df = pd_joined[list(micro_vars.values())]
+    micro_df.rename(columns=dict((v, k) for k, v in micro_vars.items()), inplace=True)
+    micro_df.to_parquet("micro_{}.parquet".format(args.sd), engine="fastparquet")
+    print("Dumped micro dataframe to parquet file")
 
 
 if __name__ == "__main__":

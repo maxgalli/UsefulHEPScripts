@@ -9,7 +9,7 @@ hep.style.use("CMS")
 def main():
 
     processed_nano = "lead_processed_nano.root"
-    xml_model = "bdt.xml"
+    xml_model = "bdt_original.xml"
 
     # Standard TMVA
     print("Standard way")

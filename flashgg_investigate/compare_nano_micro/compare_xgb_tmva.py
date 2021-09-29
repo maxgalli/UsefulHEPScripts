@@ -48,7 +48,7 @@ def parse_arguments():
 
 def main(args):
 
-    processed_nano = "lead_processed_nano.root"
+    processed_nano = "tmva_xgboost_reproducers/lead_processed_nano_uncorr.root"
     df = pd.read_parquet(args.input_dataframe)
     print("Read input dataframe:\n{}".format(df))
 
@@ -86,8 +86,9 @@ def main(args):
     bdt_inputs = np.column_stack([ak.to_numpy(ak_arr[name]) for name in var_order])
     tempmatrix = xgboost.DMatrix(bdt_inputs, feature_names=var_order)
     lead_idmva_xgboost = mva.predict(tempmatrix)
-    #lead_idmva_xgboost = 1. / (1. + np.exp(-1. * (lead_idmva_xgboost + 1.)))
-    lead_idmva_xgboost = 2. / (1. + np.exp(-2 * (lead_idmva_xgboost + 1.0))) - 1.
+    # Thomas workflow
+    lead_idmva_xgboost = -np.log(1./lead_idmva_xgboost - 1.)
+    lead_idmva_xgboost = 2. / (1. + np.exp(-2.*lead_idmva_xgboost)) - 1.
 
     # Dump nanoaod inputs to a TTree
     with uproot3.recreate(processed_nano) as f:

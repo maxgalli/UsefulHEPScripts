@@ -1,0 +1,270 @@
+{
+ "isolations": {
+  "phoIso": {
+   "EE": {
+    "peak2tail": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := peak2tail_rnd"
+     ], 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalTailRegressor_EE_probePhoIso.json"
+    }, 
+    "peak_tail_clfs": {
+     "weights_data": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/data_clf_p0t_EE_probePhoIso.json", 
+     "weights_mc": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/mc_clf_p0t_EE_probePhoIso.json", 
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll"
+     ]
+    }, 
+    "morphing": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := pfPhoIso03"
+     ], 
+     "scale": 0.03659398460457955, 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EE_probePhoIso.json", 
+     "center": -0.005993524078167001
+    }
+   }, 
+   "EB": {
+    "peak2tail": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := peak2tail_rnd"
+     ], 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalTailRegressor_EB_probePhoIso.json"
+    }, 
+    "peak_tail_clfs": {
+     "weights_data": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/data_clf_p0t_EB_probePhoIso.json", 
+     "weights_mc": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/mc_clf_p0t_EB_probePhoIso.json", 
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll"
+     ]
+    }, 
+    "morphing": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := pfPhoIso03"
+     ], 
+     "scale": 0.08328429357760053, 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EB_probePhoIso.json", 
+     "center": 0.04449992030025607
+    }
+   }
+  }, 
+  "chIso": {
+   "EE": {
+    "chIso_peak2tail": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := pfChargedIsoWorstVtx", 
+      "f5 := peak2tail_chIso_rnd"
+     ], 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalTailRegressor_EE_probeChIso03.json"
+    }, 
+    "peak_tail_clfs": {
+     "weights_data": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/data_clf_3Cat_EE_probeChIso03_probeChIso03worst.json", 
+     "weights_mc": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/mc_clf_3Cat_EE_probeChIso03_probeChIso03worst.json", 
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll"
+     ]
+    }, 
+    "chIsoWorst_peak2tail": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := pfChargedIsoPFPV", 
+      "f5 := peak2tail_chIsoWorst_rnd"
+     ], 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalTailRegressor_EE_probeChIso03worst.json"
+    }, 
+    "chIsoWorst_morphing": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := pfChargedIsoPFPV", 
+      "f5 := pfChargedIsoWorstVtx"
+     ], 
+     "scale": 0.06937509297950828, 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EE_probeChIso03worst.json", 
+     "center": -0.012102991445168576
+    }, 
+    "chIso_morphing": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := pfChargedIsoPFPV", 
+      "f5 := pfChargedIsoWorstVtx"
+     ], 
+     "scale": 0.053902877744458275, 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EE_probeChIso03.json", 
+     "center": 0.005629398768536298
+    }
+   }, 
+   "EB": {
+    "chIso_peak2tail": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := pfChargedIsoWorstVtx", 
+      "f5 := peak2tail_chIso_rnd"
+     ], 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalTailRegressor_EB_probeChIso03.json"
+    }, 
+    "peak_tail_clfs": {
+     "weights_data": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/data_clf_3Cat_EB_probeChIso03_probeChIso03worst.json", 
+     "weights_mc": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/mc_clf_3Cat_EB_probeChIso03_probeChIso03worst.json", 
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll"
+     ]
+    }, 
+    "chIsoWorst_peak2tail": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := pfChargedIsoPFPV", 
+      "f5 := peak2tail_chIsoWorst_rnd"
+     ], 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalTailRegressor_EB_probeChIso03worst.json"
+    }, 
+    "chIsoWorst_morphing": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := pfChargedIsoPFPV", 
+      "f5 := pfChargedIsoWorstVtx"
+     ], 
+     "scale": 0.07698244070093274, 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EB_probeChIso03worst.json", 
+     "center": 0.08875002442737878
+    }, 
+    "chIso_morphing": {
+     "variables": [
+      "f0 := pt", 
+      "f1 := eta", 
+      "f2 := phi", 
+      "f3 := fixedGridRhoAll", 
+      "f4 := pfChargedIsoPFPV", 
+      "f5 := pfChargedIsoWorstVtx"
+     ], 
+     "scale": 0.07033647601213677, 
+     "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EB_probeChIso03.json", 
+     "center": 0.03309216961513517
+    }
+   }
+  }
+ }, 
+ "shower_shapes": {
+  "sieie": {
+   "EE": {
+    "scale": 0.0004274773880549934, 
+    "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EE_probeSigmaIeIe.json", 
+    "center": 0.00022834476687329242
+   }, 
+   "EB": {
+    "scale": 9.16444903149064e-05, 
+    "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EB_probeSigmaIeIe.json", 
+    "center": -1.7937031871344093e-05
+   }
+  }, 
+  "etaWidth": {
+   "EE": {
+    "scale": 0.0004501920716418325, 
+    "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EE_probeEtaWidth.json", 
+    "center": 0.00026279990833288913
+   }, 
+   "EB": {
+    "scale": 0.0002980484981690405, 
+    "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EB_probeEtaWidth.json", 
+    "center": -6.979588719400326e-06
+   }
+  }, 
+  "r9": {
+   "EE": {
+    "scale": 0.01370282259444966, 
+    "weights": "/work/gallim/devel/HiggsDNA_studies/tmva-to-xgboost/2017_weights/corrections/weights_finalRegressor_EE_r9.json", 
+    "center": -0.007243889920611868
+   }, 
+   "EB": {
+    "scale": 0.008903793308924074, 
+    "weights": "/work/gallim/devel/HiggsDNA_studies/tmva-to-xgboost/2017_weights/corrections/weights_finalRegressor_EB_r9.json", 
+    "center": -0.0031396514172706835
+   }
+  }, 
+  "phiWidth": {
+   "EE": {
+    "scale": 0.0020769732429961885, 
+    "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EE_probePhiWidth.json", 
+    "center": 0.0012185156608152982
+   }, 
+   "EB": {
+    "scale": 0.0015185118270562956, 
+    "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EB_probePhiWidth.json", 
+    "center": 0.0004858939940410737
+   }
+  }, 
+  "sieip": {
+   "EE": {
+    "scale": 1.8787174515417313e-05, 
+    "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EE_probeCovarianceIeIp.json", 
+    "center": -9.748050865400002e-06
+   }, 
+   "EB": {
+    "scale": 1.0568535179511535e-06, 
+    "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EB_probeCovarianceIeIp.json", 
+    "center": -2.7280449875290024e-08
+   }
+  }, 
+  "s4": {
+   "EE": {
+    "scale": 0.014026992905521729, 
+    "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EE_probeS4.json", 
+    "center": -0.009796456994442537
+   }, 
+   "EB": {
+    "scale": 0.006373763449430178, 
+    "weights": "aux-data/Taggers/PhoIdInputsCorrections/2017_Legacy_xgb/weights_finalRegressor_EB_probeS4.json", 
+    "center": -0.002431847699673806
+   }
+  }
+ }
+}
