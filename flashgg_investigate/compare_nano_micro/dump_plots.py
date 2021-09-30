@@ -170,19 +170,22 @@ def main(args):
         up.set_xlim(range)
         up.set_xlabel(column["var"])
         up.set_ylabel("Events")
-
+        if "log" in column:
+            up.set_yscale("log")
+        
         # Middle
-        ylim = [-0.4, 0.4]
+        ylim = [0, 2]
         middle.set_ylim(ylim)
-        middle.axhline(0, xmin=range[0], xmax=range[1], color="black", ls="--", lw=".4")
+        #middle.axhline(1, xmin=range[0], xmax=range[1], color="black", alpha=0.6)
         centers = (n_[:-1] + n_[1:]) / 2
-        middle.plot(centers, (n - m) / m, "k.")
+        middle.plot(centers, n / m, "k.")
         middle.set_xlim(range)
         middle.set_xlabel(column["var"])
-        middle.set_ylabel("$(n - \mu)/\mu$ [%]")
+        middle.set_ylabel("$n/\mu$")
+        middle.grid(which="both")
 
         # Down
-        perc_range = (-100, 100)
+        perc_range = (-300, 300)
         perc_bins = 500
         down.hist(100 * (pd_joined[nano_name] - pd_joined[micro_name]) / pd_joined[micro_name], 
                   bins=perc_bins,
@@ -191,8 +194,8 @@ def main(args):
                   density=True,
                   color="black",
                   linewidth=2)
-        down.set_yscale("log")
-        down.set_xlabel("$(n - \mu)/\mu$ [%]")
+        #down.set_yscale("log")
+        down.set_xlabel("$(n_{ev} - \mu_{ev})/\mu_{ev}$ [%]")
         down.set_ylabel("Events / {}%".format((perc_range[1] - perc_range[0]) / perc_bins))
 
         print(column["nano_col"])
@@ -241,6 +244,24 @@ def main(args):
         "mva_ID": "lead_mva"
         }
 
+    nano_isos = {
+        "pfPhoIso03": "lead_pfPhoIso03",
+        "pfChargedIsoPFPV": "lead_pfChargedIsoPFPV",
+        "pfChargedIsoWorstVtx": "lead_pfChargedIsoWorstVtx",
+        "pfPhoIso03_uncorr": "lead_uncorr_pfPhoIso03",
+        "pfChargedIsoPFPV_uncorr": "lead_uncorr_pfChargedIsoPFPV",
+        "pfChargedIsoWorstVtx_uncorr": "lead_uncorr_pfChargedIsoWorstVtx",
+        }
+
+    micro_isos = {
+        "pfPhoIso03": "lead_pho_iso",
+        "pfChargedIsoPFPV": "lead_ch_iso",
+        "pfChargedIsoWorstVtx": "lead_ch_iso_worst",
+        "pfPhoIso03_uncorr": "lead_pho_iso_uncorr",
+        "pfChargedIsoPFPV_uncorr": "lead_ch_iso_uncorr",
+        "pfChargedIsoWorstVtx_uncorr": "lead_ch_iso_worst_uncorr",
+       }
+
     nano_df = pd_joined[list(nano_vars.values())]
     nano_df.rename(columns=dict((v, k) for k, v in nano_vars.items()), inplace=True)
     nano_df.to_parquet("nano_{}.parquet".format(args.sd), engine="fastparquet")
@@ -250,6 +271,17 @@ def main(args):
     micro_df.rename(columns=dict((v, k) for k, v in micro_vars.items()), inplace=True)
     micro_df.to_parquet("micro_{}.parquet".format(args.sd), engine="fastparquet")
     print("Dumped micro dataframe to parquet file")
+
+    nano_df = pd_joined[list(nano_isos.values())]
+    nano_df.rename(columns=dict((v, k) for k, v in nano_isos.items()), inplace=True)
+    nano_df.to_parquet("nano_{}_isos.parquet".format(args.sd), engine="fastparquet")
+    print("Dumped nano dataframe for isos to parquet file")
+
+    micro_df = pd_joined[list(micro_isos.values())]
+    micro_df.rename(columns=dict((v, k) for k, v in micro_isos.items()), inplace=True)
+    micro_df.to_parquet("micro_{}_isos.parquet".format(args.sd), engine="fastparquet")
+    print("Dumped micro dataframe for isos to parquet file")
+
 
 
 if __name__ == "__main__":
