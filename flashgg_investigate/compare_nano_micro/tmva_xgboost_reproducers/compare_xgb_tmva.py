@@ -25,8 +25,8 @@ def main():
 
     processed_nano = "lead_processed_nano.root"
     
-    xml_model = "bdt_original.xml"
-    xgb_model = "bdt_original.json"
+    xml_model = "bdt.xml"
+    xgb_model = "bdt.json"
     if py2:
         xml_model = "bdt_original_py2.xml"
         xgb_model = "bdt_original_py2.xgb"
@@ -53,7 +53,6 @@ def main():
     tempmatrix = xgboost.DMatrix(bdt_inputs, feature_names=var_order)
     lead_idmva_xgboost = mva.predict(tempmatrix)
     # Thomas workflow
-    lead_idmva_xgboost = -np.log(1./lead_idmva_xgboost - 1.)
     lead_idmva_xgboost = 1.0 - 2.0 / (1.0 + np.exp(2.0 * lead_idmva_xgboost))
     
     #lead_idmva_xgboost = 2 * lead_idmva_xgboost - 1
