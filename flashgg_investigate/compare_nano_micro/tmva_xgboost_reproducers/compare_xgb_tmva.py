@@ -54,7 +54,7 @@ def main():
     lead_idmva_xgboost = mva.predict(tempmatrix)
     # Thomas workflow
     lead_idmva_xgboost = -np.log(1./lead_idmva_xgboost - 1.)
-    lead_idmva_xgboost = 2. / (1. + np.exp(-2.*lead_idmva_xgboost)) - 1.
+    lead_idmva_xgboost = 1.0 - 2.0 / (1.0 + np.exp(2.0 * lead_idmva_xgboost))
     
     #lead_idmva_xgboost = 2 * lead_idmva_xgboost - 1
     #lead_idmva_xgboost = 1. / (1. + np.exp(-1. * (lead_idmva_xgboost + 1.)))
