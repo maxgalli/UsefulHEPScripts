@@ -1,0 +1,262 @@
+[
+    {
+        "name": "tag_pt",
+        "title": "Tag p_{T}",
+        "x_label": "p_{T} [GeV]",
+        "bins": 50,
+        "range": [
+            0,
+            200
+        ]
+    },
+    {
+        "name": "probe_pt",
+        "title": "Probe p_{T}",
+        "x_label": "p_{T} [GeV]",
+        "bins": 50,
+        "range": [
+            0,
+            200
+        ]
+    },
+    {
+        "name": "tag_mvaID",
+        "title": "Tag MVA ID",
+        "x_label": "MVA ID",
+        "bins": 50,
+        "range": [
+            0,
+            1
+        ]
+    },
+    {
+        "name": "probe_mvaID",
+        "title": "Probe MVA ID",
+        "x_label": "MVA ID",
+        "bins": 50,
+        "range": [
+            0,
+            1
+        ]
+    },
+    {
+        "name": "tag_energyRaw",
+        "title": "Tag energyRaw",
+        "x_label": "energyRaw",
+        "bins": 100,
+        "range": [
+            0,
+            300
+        ]
+    },
+    {
+        "name": "probe_energyRaw",
+        "title": "Probe energyRaw",
+        "x_label": "energyRaw",
+        "bins": 100,
+        "range": [
+            0,
+            300
+        ]
+    },
+    {
+        "name": "tag_r9",
+        "title": "Tag r9",
+        "x_label": "r9",
+        "bins": 100,
+        "range": [
+            0.4,
+            1.1
+        ]
+    },
+    {
+        "name": "probe_r9",
+        "title": "Probe r9",
+        "x_label": "r9",
+        "bins": 100,
+        "range": [
+            0.4,
+            1.1
+        ]
+    },
+    {
+        "name": "tag_sieie",
+        "title": "Tag sieie",
+        "x_label": "sieie",
+        "bins": 100,
+        "range": [
+            0.002,
+            0.015
+        ]
+    },
+    {
+        "name": "probe_sieie",
+        "title": "Probe sieie",
+        "x_label": "sieie",
+        "bins": 100,
+        "range": [
+            0.002,
+            0.015
+        ]
+    },
+    {
+        "name": "tag_etaWidth",
+        "title": "Tag etaWidth",
+        "x_label": "etaWidth",
+        "bins": 100,
+        "range": [
+            0,
+            0.03
+        ]
+    },
+    {
+        "name": "probe_etaWidth",
+        "title": "Probe etaWidth",
+        "x_label": "etaWidth",
+        "bins": 100,
+        "range": [
+            0,
+            0.03
+        ]
+    },
+    {
+        "name": "tag_phiWidth",
+        "title": "Tag phiWidth",
+        "x_label": "phiWidth",
+        "bins": 100,
+        "range": [
+            0,
+            0.1
+        ]
+    },
+    {
+        "name": "probe_phiWidth",
+        "title": "Probe phiWidth",
+        "x_label": "phiWidth",
+        "bins": 100,
+        "range": [
+            0,
+            0.1
+        ]
+    },
+    {
+        "name": "tag_sieip",
+        "title": "Tag sieip",
+        "x_label": "sieip",
+        "bins": 100,
+        "range": [
+            -0.0002,
+            0.0002
+        ]
+    },
+    {
+        "name": "probe_sieip",
+        "title": "Probe sieip",
+        "x_label": "sieip",
+        "bins": 100,
+        "range": [
+            -0.0002,
+            0.0002
+        ]
+    },
+    {
+        "name": "tag_s4",
+        "title": "Tag s4",
+        "x_label": "s4",
+        "bins": 100,
+        "range": [
+            0.4,
+            1
+        ]
+    },
+    {
+        "name": "probe_s4",
+        "title": "Probe s4",
+        "x_label": "s4",
+        "bins": 100,
+        "range": [
+            0.4,
+            1
+        ]
+    },
+    {
+        "name": "tag_pfPhoIso03",
+        "title": "Tag pfPhoIso03",
+        "x_label": "pfPhoIso03",
+        "bins": 100,
+        "range": [
+            0,
+            1
+        ]
+    },
+    {
+        "name": "probe_pfPhoIso03",
+        "title": "Probe pfPhoIso03",
+        "x_label": "pfPhoIso03",
+        "bins": 100,
+        "range": [
+            0,
+            1
+        ]
+    },
+    {
+        "name": "tag_pfChargedIsoPFPV",
+        "title": "Tag pfChargedIsoPFPV",
+        "x_label": "pfChargedIsoPFPV",
+        "bins": 100,
+        "range": [
+            0,
+            5
+        ]
+    },
+    {
+        "name": "probe_pfChargedIsoPFPV",
+        "title": "Probe pfChargedIsoPFPV",
+        "x_label": "pfChargedIsoPFPV",
+        "bins": 100,
+        "range": [
+            0,
+            5
+        ]
+    },
+    {
+        "name": "tag_pfChargedIsoWorstVtx",
+        "title": "Tag pfChargedIsoWorstVtx",
+        "x_label": "pfChargedIsoWorstVtx",
+        "bins": 100,
+        "range": [
+            0,
+            10
+        ]
+    },
+    {
+        "name": "probe_pfChargedIsoWorstVtx",
+        "title": "Probe pfChargedIsoWorstVtx",
+        "x_label": "pfChargedIsoWorstVtx",
+        "bins": 100,
+        "range": [
+            0,
+            10
+        ]
+    },
+    {
+        "name": "tag_eta",
+        "title": "Tag eta",
+        "x_label": "eta",
+        "bins": 100,
+        "range": [
+            -2.5,
+            2.5
+        ]
+    },
+    {
+        "name": "probe_eta",
+        "title": "Probe eta",
+        "x_label": "eta",
+        "bins": 100,
+        "range": [
+            -2.5,
+            2.5
+        ]
+    }
+]
