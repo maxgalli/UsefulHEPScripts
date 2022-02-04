@@ -20,14 +20,15 @@ def ws_to_dict(ws):
         "variables": [],
         "functions": [],
         "pdfs": [],
-        "datasets": [],
-        "histograms": [],
         "constants": [],
         "categories": [],
-        "other": []
+        "other": [],
+        "unbinned_data": [],
+        "binned_data": []
     }
 
     objects = ws.components()
+    data = ws.allData()
 
     for obj in objects:
         if obj.InheritsFrom('RooRealVar'):
@@ -36,14 +37,18 @@ def ws_to_dict(ws):
             ws_dict['functions'].append(make_dict(obj))
         elif obj.InheritsFrom('RooAbsPdf'):
             ws_dict['pdfs'].append(make_dict(obj))
-        elif obj.InheritsFrom('RooDataSet'):
-            ws_dict['datasets'].append(make_dict(obj))
-        elif obj.InheritsFrom('RooDataHist'):
-            ws_dict['histograms'].append(make_dict(obj))
         elif obj.InheritsFrom('RooConstVar'):
             ws_dict['constants'].append(make_dict(obj))
         elif obj.InheritsFrom('RooCategory'):
             ws_dict['categories'].append(make_dict(obj))
+        else:
+            ws_dict['other'].append(make_dict(obj))
+
+    for obj in data:
+        if obj.InheritsFrom('RooDataSet'):
+            ws_dict['unbinned_data'].append(make_dict(obj))
+        elif obj.InheritsFrom('RooDataHist'):
+            ws_dict['binned_data'].append(make_dict(obj))
         else:
             ws_dict['other'].append(make_dict(obj))
 
