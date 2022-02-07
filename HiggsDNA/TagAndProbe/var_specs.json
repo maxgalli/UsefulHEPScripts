@@ -258,5 +258,45 @@
             -2.5,
             2.5
         ]
+    },
+    {
+        "name": "tag_phi",
+        "title": "Tag phi",
+        "x_label": "phi",
+        "bins": 100,
+        "range": [
+            -3.14,
+            3.14
+        ]
+    },
+    {
+        "name": "probe_phi",
+        "title": "Probe phi",
+        "x_label": "phi",
+        "bins": 100,
+        "range": [
+            -3.14,
+            3.14
+        ]
+    },
+    {
+        "name": "probe_fixedGridRhoAll",
+        "title": "Probe fixedGridRhoAll",
+        "x_label": "rho",
+        "bins": 100,
+        "range": [
+            0,
+            50
+        ]
+    },
+    {
+        "name": "mass",
+        "title": "mass",
+        "x_label": "mass",
+        "bins": 40,
+        "range": [
+            80,
+            100
+        ]
     }
 ]
