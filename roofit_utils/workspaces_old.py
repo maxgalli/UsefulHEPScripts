@@ -1,4 +1,4 @@
-from cppyy.gbl import (
+from ROOT import (
     RooRealVar,
     RooFormulaVar,
     RooAbsPdf,
@@ -30,7 +30,9 @@ def ws_to_dict(ws):
     objects = ws.components()
     data = ws.allData()
 
-    for obj in objects:
+    objects_it = objects.createIterator()
+    obj = objects_it.Next()
+    while obj != None:
         if obj.InheritsFrom("RooRealVar"):
             ws_dict["variables"].append(make_dict(obj))
         elif obj.InheritsFrom("RooFormulaVar") or obj.InheritsFrom(
@@ -45,7 +47,9 @@ def ws_to_dict(ws):
             ws_dict["categories"].append(make_dict(obj))
         else:
             ws_dict["other"].append(make_dict(obj))
+        obj = objects_it.Next()
 
+    data = list(data)
     for obj in data:
         if obj.InheritsFrom("RooDataSet"):
             ws_dict["unbinned_data"].append(make_dict(obj))
