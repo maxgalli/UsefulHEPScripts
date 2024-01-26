@@ -101,7 +101,7 @@ def main(args):
                 sharex=True
                 )
         ax.errorbar(x_vtx0["values"], y_vtx0["values"], xerr=x_vtx0["unc"], yerr=np.array(y_vtx0["unc"]).T, fmt='ro', label="Vertex 0th")
-        ax.errorbar(x_vtxc["values"], y_vtxc["values"], xerr=x_vtxc["unc"], yerr=np.array(y_vtxc["unc"]).T, fmt='bs', label="Vertex Reco")
+        ax.errorbar(x_vtxc["values"], y_vtxc["values"], xerr=x_vtxc["unc"], yerr=np.array(y_vtxc["unc"]).T, fmt='bs', label=r"PV Run2 $H \rightarrow \gamma \gamma$")
 
         rdiff = [
             rel_diff_asymm(v0, vc, v0_uncs, vc_uncs) for v0, vc, v0_uncs, vc_uncs in zip(

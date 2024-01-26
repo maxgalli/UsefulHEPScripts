@@ -53,6 +53,9 @@ def sigma_effective(arr):
 def rel_diff(a, b):
     return abs(a - b) / max(a, b)
 
+def squared_diff(a, b):
+    return np.sqrt(np.abs(a**2 - b**2))
+
 def main(args):
     logger = setup_logging()
 
@@ -150,15 +153,17 @@ def main(args):
                 x_s[vtx_name], 
                 [cat_spec["sigma_effective"] for cat_spec in plots_specs[vtx_name].values()],
                 fmts[vtx_name], 
-                label=vtx_name
+                label=vtx_name if vtx_name == "Vertex 0th" else r"PV Run2 $H \rightarrow \gamma \gamma$"
                 )
 
-    rax_y = [rel_diff(s0, sc) for s0, sc in zip(
+    #rax_y = [rel_diff(s0, sc) for s0, sc in zip(
+    rax_y = [squared_diff(s0, sc) for s0, sc in zip(
         [plots_specs["Vertex 0th"][cat]["sigma_effective"] for cat in list(categories["Vertex 0th"].keys())],
         [plots_specs["Vertex Reco"][cat]["sigma_effective"] for cat in list(categories["Vertex Reco"].keys())]
     )]
 
-    logger.info("Relative differences: {}".format(rax_y))
+    #logger.info("Relative differences: {}".format(rax_y))
+    logger.info("Squared differences: {}".format(rax_y))
 
     rax.plot(
             x_s["Vertex 0th"], 
@@ -173,10 +178,12 @@ def main(args):
 
     rax.set_xlabel("$\sigma_M / M$")
     ax.set_ylabel("$\sigma_{effective}$")
-    rax.set_ylabel("$rel\ diff$")
+    #rax.set_ylabel("$rel\ diff$")
+    rax.set_ylabel("$\sqrt{\sigma_{\mathrm{eff}, 0}^2 - \sigma_{\mathrm{eff}, \gamma\gamma}^2}$")
     ax.set_xlim(0.)
     ax.set_ylim(0.)
-    rax.set_ylim(-0.01, 0.2)
+    #rax.set_ylim(-0.01, 0.2)
+    rax.set_ylim(-0.01, 2)
     ax.legend(loc="upper left")
     ax.grid(which="both")
     rax.grid(which="both")
